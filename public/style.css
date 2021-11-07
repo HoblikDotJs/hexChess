@@ -1,0 +1,11 @@
+* {
+  padding: 0;
+  margin: 0;
+  touch-action: manipulation;
+}
+
+button {
+  margin-left: 40vw;
+  width: 20vw;
+  height: 3vh;
+}

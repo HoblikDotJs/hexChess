@@ -1,0 +1,92 @@
+Pieces:
+    P:
+        UP:
+            ODD:
+                X+1, Y+0
+                X+0, Y-1
+                X-1, Y+0
+            EVEN:
+                X+1, Y-1
+                X+0, Y-1
+                X-1, Y-1
+    I:
+        UP:
+            Y+1
+        DOWN:
+            Y-1
+        LEFT:
+            ODD:
+                X-1,Y+0
+            EVEN:
+                 X-1,Y+1; X-1, Y-1
+        RIGHT:
+            ODD:
+                X+1, Y+0
+            EVEN:
+                X-1,Y-1; X+1, Y-1
+    R:
+        UP:
+            Y+1 DONE
+        DOWN:
+            Y-1 DONE
+        LEFT:
+            ODD:
+                X+1,Y+1; X+1, Y-1
+            EVEN:
+                X+1, Y+0
+        RIGHT:
+            ODD:
+                X+1, Y-1; X+1,Y+1
+            EVEN:
+                X+1, Y+0
+    N: ----
+    B:
+        UP: 
+            ODD: X+1, Y+0
+            EVEN: X+1, Y+1
+        DOWN: 
+            ODD: X+1, Y+1
+            EVEN: X+1, Y+0
+    K:
+        ODD:
+             UP:
+                UP:
+                    X+0, Y-1
+                RIGHT:
+                    X+1, Y-1
+                LEFT:
+                    X-1, Y-1
+            DOWN:
+                DOWN:
+                    X+0, Y+1
+                RIGHT:
+                    X+1, Y+0
+                LEFT:
+                    X-1, Y+0
+        EVEN:
+            UP:
+                UP:
+                    X+0,Y-1
+                RIGHT:
+                    X+1, Y+0
+                LEFT:
+                    X-1, Y+0
+            DOWN:
+                DOWN:
+                    X+0, Y+1
+                RIGHT:
+                    X+1, Y+1
+                LEFT:
+                    X-1, Y+1
+    Q:
+        UP:
+            X+0, Y-1
+        DOWN:
+            X+0, Y+1
+        LEFT:
+            X+2
+        DLEFT: 
+            B
+        DRIGHT:
+            B
+    
