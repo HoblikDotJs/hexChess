@@ -4,7 +4,7 @@ let w;
 let offset
 let actions;
 let highlighted = [];
-let clickedPiece;
+let clickedPiece, myColor;
 let pieces = {}
 
 function preload() {
@@ -26,20 +26,50 @@ socket.on('board', msg => {
     board = msg;
 })
 
+socket.on('color', msg => {
+    myColor = msg;
+    if (msg == 1) {
+        myColor = "+"
+    }
+    if (msg == -1) {
+        myColor = "-"
+    }
+})
+
 socket.on('availableMoves', msg => {
     actions = msg;
 })
 
 function setup() {
+    let roomId = new URLSearchParams(window.location.search).get("invite");
+    if (roomId) {
+        socket.emit('joinRoom', roomId)
+    }
     imageMode(CENTER);
     createCanvas(min(windowWidth, windowHeight), min(windowWidth, windowHeight) * 1.1);
     w = min(windowWidth, windowHeight) * 0.112
     let button = createButton('UNDO')
-    button.mousePressed(e => {
+    button.mousePressed(() => {
         socket.emit('undo');
         highlighted = []
     })
-
+    if (!roomId) {
+        let button2 = createButton('INVITE')
+        button2.mousePressed(() => {
+            socket.emit('joinRoom', "room" + socket.id);
+            if (navigator.share) {
+                navigator.share({
+                        title: document.title,
+                        text: "Invitation",
+                        url: window.location.origin + "?invite=room" + socket.id
+                    })
+                    .then(() => console.log('Successful share'))
+                    .catch(error => console.log('Error sharing:', error));
+            } else {
+                alert("Please share this to your opponent: " + "room" + socket.id)
+            }
+        })
+    }
 }
 
 function draw() {
@@ -130,7 +160,7 @@ function draw() {
 
 function showAvailableMoves(x, y) {
     for (let action of actions) {
-        if (action.x == x && action.y == y) {
+        if (action.x == x && action.y == y && board[y][x].slice(0, 1) == myColor) {
             highlighted = action.actions
             if (highlighted.length > 0) {
                 clickedPiece = {

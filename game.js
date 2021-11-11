@@ -14,7 +14,7 @@ class Rook {
         this.c = c;
         this.notation = "R";
     }
-    getAvailableMoves() {
+    getAvailableMoves(board) {
         let result = [];
         //~~+~~+~~+~~+~UP&DOWN~+~~+~~+~~+~~//
         for (let y = this.y + 1; y <= 7; y++) {
@@ -202,7 +202,7 @@ class InvertedRook {
         this.c = c;
         this.notation = "I";
     }
-    getAvailableMoves() {
+    getAvailableMoves(board) {
         let result = [];
         //~~+~~+~~+~~+~UP&DOWN~+~~+~~+~~+~~//
         for (let y = this.y + 1; y <= 7; y++) {
@@ -403,7 +403,7 @@ class Knight {
         this.c = c;
         this.notation = "N";
     }
-    getAvailableMoves() {
+    getAvailableMoves(board) {
         let result = [];
         //~+~~+~~+~~UP~~+~~+~~+~//
         if (isOdd(this.x)) {
@@ -444,7 +444,7 @@ class Bishop {
         this.c = c;
         this.notation = "B";
     }
-    getAvailableMoves() {
+    getAvailableMoves(board) {
         let result = [];
         if (isOdd(this.x)) {
             //~~+~~+~~+~~+~RIGHT UP~+~~+~~+~~+~~//
@@ -658,7 +658,7 @@ class King {
         this.c = c;
         this.notation = "K";
     }
-    getAvailableMoves() {
+    getAvailableMoves(board) {
         let result = [];
         //~+~~+~~+~~UP~~+~~+~~+~//
         if (isOdd(this.x)) {
@@ -699,7 +699,7 @@ class Queen {
         this.c = c;
         this.notation = "Q";
     }
-    getAvailableMoves() {
+    getAvailableMoves(board) {
         let result = [];
         //~~+~~+~~+~~+~UP&DOWN~+~~+~~+~~+~~//
         for (let y = this.y + 1; y <= 7; y++) {
@@ -975,7 +975,7 @@ class Pawn {
         this.c = c;
         this.notation = "P";
     }
-    getAvailableMoves() {
+    getAvailableMoves(board) {
         let result = [];
         //~+~~+~~+~~UP~~+~~+~~+~//
         if ((this.y != 7 && this.c == -1) || (this.y != 0 && this.c == 1)) {
@@ -1101,216 +1101,235 @@ function isOdd(x) {
     return x % 2 == 1;
 }
 
-let board = makeBoard();
-board = fillBoard(board);
-updateAvailableMoves(board);
-let simplifiedBoard = displayBoard(board);
-let history = [simplifiedBoard];
-let actions = getActions(board);
-let actionHistory = [actions]
-
-function updateAvailableMoves(b) {
-    let board = b;
-    for (let y = 0; y < 8; y++) {
-        for (let x = 0; x < 8; x++) {
-            if (board[y][x].piece.notation != "") {
-                board[y][x].piece.getAvailableMoves();
-            }
-        }
+class Game {
+    constructor() {
+        this.board = this.makeBoard();
+        this.board = this.fillBoard(this.board);
+        this.updateAvailableMoves(this.board);
+        this.simplifiedBoard = this.displayBoard(this.board);
+        this.history = [this.simplifiedBoard];
+        this.actions = this.getActions(this.board);
+        this.actionHistory = [this.actions]
+        this.idWhite = "";
+        this.idBlack = "";
+        this.whoMoves = 1;
     }
 
-}
-
-function getActions(b) {
-    let result = [];
-    for (let y = 0; y < 8; y++) {
-        for (let x = 0; x < 8; x++) {
-            if (b[y][x].piece.notation != "") {
-                result.push({
-                    x,
-                    y,
-                    actions: b[y][x].piece.availableMoves
-                })
-            }
+    hasHistory() {
+        if (this.history.length > 1) {
+            return true;
         }
+        return false;
     }
 
-    return result;
-}
-
-function makeBoard() {
-    const board = [
-        [],
-        [],
-        [],
-        [],
-        [],
-        [],
-        [],
-        []
-    ]
-    const dim = 8;
-    for (let y = 0; y < 8; y++) {
-        for (let x = 0; x < 8; x++) {
-            board[y][x] = new Hexagon(x, y, {
-                notation: ""
-            });
-        }
+    getSimplifiedBoard() {
+        return this.displayBoard(this.board)
     }
-    return board;
-}
 
-function fillBoard(b) {
-    let board = b;
-    for (let y = 0; y < 8; y++) {
-        for (let x = 0; x < 8; x++) {
-            if (y == 1 || y == 6) {
-                board[y][x].piece = new Pawn(x, y, y == 1 ? -1 : 1)
+    getPreviousBoard() {
+        this.history.pop()
+        this.actionHistory.pop()
+        let simplifiedBoard = this.history[this.history.length - 1];
+        this.actions = this.actionHistory[this.actionHistory.length - 1];
+        this.board = this.fillBoardSimplified(simplifiedBoard);
+        return simplifiedBoard;
+    }
+
+    fillBoardSimplified(simplifiedBoard) {
+        let board = this.makeBoard();
+        for (let y = 0; y < 8; y++) {
+            for (let x = 0; x < 8; x++) {
+                let color = -1;
+                if (simplifiedBoard[y][x].slice(0, 1) == "+") {
+                    color = 1;
+                }
+                switch (simplifiedBoard[y][x].slice(1, 2)) {
+                    case "R":
+                        board[y][x].piece = new Rook(x, y, color)
+                        break;
+                    case "N":
+                        board[y][x].piece = new Knight(x, y, color)
+                        break;
+                    case "B":
+                        board[y][x].piece = new Bishop(x, y, color)
+                        break;
+                    case "Q":
+                        board[y][x].piece = new Queen(x, y, color)
+                        break;
+                    case "K":
+                        board[y][x].piece = new King(x, y, color)
+                        break;
+                    case "I":
+                        board[y][x].piece = new InvertedRook(x, y, color)
+                        break;
+                    case "P":
+                        board[y][x].piece = new Pawn(x, y, color)
+                        break;
+                }
+
             }
-            if (y == 0 || y == 7) {
-                switch (x) {
-                    case 0:
-                        board[y][x].piece = new Rook(x, y, y == 0 ? -1 : 1)
-                        break;
-                    case 1:
-                        board[y][x].piece = new Knight(x, y, y == 0 ? -1 : 1)
-                        break;
-                    case 2:
-                        board[y][x].piece = new Bishop(x, y, y == 0 ? -1 : 1)
-                        break;
-                    case 3:
-                        board[y][x].piece = new Queen(x, y, y == 0 ? -1 : 1)
-                        break;
-                    case 4:
-                        board[y][x].piece = new King(x, y, y == 0 ? -1 : 1)
-                        break;
-                    case 5:
-                        board[y][x].piece = new Bishop(x, y, y == 0 ? -1 : 1)
-                        break;
-                    case 6:
-                        board[y][x].piece = new Knight(x, y, y == 0 ? -1 : 1)
-                        break;
-                    case 7:
-                        board[y][x].piece = new InvertedRook(x, y, y == 0 ? -1 : 1)
-                        break;
+        }
+        return board;
+    }
+
+    move(from, to) {
+        let piece = this.board[from.y][from.x].piece;
+        this.board[from.y][from.x].piece = {
+            notation: ""
+        }
+        this.board[to.y][to.x].piece = piece;
+        this.board[to.y][to.x].piece.x = to.x;
+        this.board[to.y][to.x].piece.y = to.y;
+        this.updateAvailableMoves(this.board)
+        this.actions = this.getActions(this.board);
+        this.actionHistory.push(this.actions);
+        let newBoard = this.displayBoard(this.board);
+        this.history.push(newBoard);
+        this.whoMoves *= -1;
+        return newBoard;
+    }
+
+    getNewActions() {
+        return this.actions
+    }
+
+    displayBoard(b) {
+        let board = b;
+        let result = [
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            []
+        ]
+        for (let y = 0; y < board[0].length; y++) {
+            for (let x = 0; x < board[0].length; x++) {
+                let sign = "";
+                if (board[y][x].piece.c == -1) {
+                    sign = "-"
+                }
+                if (board[y][x].piece.c == 1) {
+                    sign = "+"
+                }
+                result[y][x] = sign + board[y][x].piece.notation;
+            }
+        }
+        //console.table(result); TODO
+        return result;
+    }
+
+    fillBoard(b) {
+        let board = b;
+        for (let y = 0; y < 8; y++) {
+            for (let x = 0; x < 8; x++) {
+                if (y == 1 || y == 6) {
+                    board[y][x].piece = new Pawn(x, y, y == 1 ? -1 : 1)
+                }
+                if (y == 0 || y == 7) {
+                    switch (x) {
+                        case 0:
+                            board[y][x].piece = new Rook(x, y, y == 0 ? -1 : 1)
+                            break;
+                        case 1:
+                            board[y][x].piece = new Knight(x, y, y == 0 ? -1 : 1)
+                            break;
+                        case 2:
+                            board[y][x].piece = new Bishop(x, y, y == 0 ? -1 : 1)
+                            break;
+                        case 3:
+                            board[y][x].piece = new Queen(x, y, y == 0 ? -1 : 1)
+                            break;
+                        case 4:
+                            board[y][x].piece = new King(x, y, y == 0 ? -1 : 1)
+                            break;
+                        case 5:
+                            board[y][x].piece = new Bishop(x, y, y == 0 ? -1 : 1)
+                            break;
+                        case 6:
+                            board[y][x].piece = new Knight(x, y, y == 0 ? -1 : 1)
+                            break;
+                        case 7:
+                            board[y][x].piece = new InvertedRook(x, y, y == 0 ? -1 : 1)
+                            break;
+                    }
                 }
             }
         }
+        return board;
     }
-    return board;
-}
 
-function displayBoard(b) {
-    let board = b;
-    let result = [
-        [],
-        [],
-        [],
-        [],
-        [],
-        [],
-        [],
-        []
-    ]
-    for (let y = 0; y < board[0].length; y++) {
-        for (let x = 0; x < board[0].length; x++) {
-            let sign = "";
-            if (board[y][x].piece.c == -1) {
-                sign = "-"
+    makeBoard() {
+        const board = [
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            []
+        ]
+        for (let y = 0; y < 8; y++) {
+            for (let x = 0; x < 8; x++) {
+                board[y][x] = new Hexagon(x, y, {
+                    notation: ""
+                });
             }
-            if (board[y][x].piece.c == 1) {
-                sign = "+"
+        }
+        return board;
+    }
+
+    getActions(b) {
+        let result = [];
+        for (let y = 0; y < 8; y++) {
+            for (let x = 0; x < 8; x++) {
+                if (b[y][x].piece.notation != "") {
+                    result.push({
+                        x,
+                        y,
+                        actions: b[y][x].piece.availableMoves
+                    })
+                }
             }
-            result[y][x] = sign + board[y][x].piece.notation;
+        }
+
+        return result;
+    }
+
+    updateAvailableMoves(b) {
+        let board = b;
+        for (let y = 0; y < 8; y++) {
+            for (let x = 0; x < 8; x++) {
+                if (board[y][x].piece.notation != "") {
+                    board[y][x].piece.getAvailableMoves(board);
+                }
+            }
+        }
+
+    }
+
+    setId(id) {
+        if (!this.idWhite) {
+            this.idWhite = id;
+        } else {
+            this.idBlack = id;
         }
     }
-    console.table(result);
-    return result;
-}
 
-function getNewActions() {
-    return actions
-}
-
-function move(from, to) {
-    let piece = board[from.y][from.x].piece;
-    board[from.y][from.x].piece = {
-        notation: ""
-    }
-    board[to.y][to.x].piece = piece;
-    board[to.y][to.x].piece.x = to.x;
-    board[to.y][to.x].piece.y = to.y;
-    updateAvailableMoves(board)
-    actions = getActions(board);
-    actionHistory.push(actions);
-    let newBoard = displayBoard(board);
-    history.push(newBoard);
-    return newBoard;
-}
-
-function fillBoardSimplified(simplifiedBoard) {
-    let board = makeBoard();
-    for (let y = 0; y < 8; y++) {
-        for (let x = 0; x < 8; x++) {
-            let color = -1;
-            if (simplifiedBoard[y][x].slice(0, 1) == "+") {
-                color = 1;
-            }
-            switch (simplifiedBoard[y][x].slice(1, 2)) {
-                case "R":
-                    board[y][x].piece = new Rook(x, y, color)
-                    break;
-                case "N":
-                    board[y][x].piece = new Knight(x, y, color)
-                    break;
-                case "B":
-                    board[y][x].piece = new Bishop(x, y, color)
-                    break;
-                case "Q":
-                    board[y][x].piece = new Queen(x, y, color)
-                    break;
-                case "K":
-                    board[y][x].piece = new King(x, y, color)
-                    break;
-                case "I":
-                    board[y][x].piece = new InvertedRook(x, y, color)
-                    break;
-                case "P":
-                    board[y][x].piece = new Pawn(x, y, color)
-                    break;
-            }
-
+    canMove(id) {
+        if (this.whoMoves == 1 && id == this.idWhite) {
+            return true;
         }
+        if (this.whoMoves == -1 && id == this.idBlack) {
+            return true;
+        }
+        return false;
     }
-    return board;
-}
-
-function getPreviousBoard() {
-    history.pop()
-    actionHistory.pop()
-    let simplifiedBoard = history[history.length - 1];
-    actions = actionHistory[actionHistory.length - 1];
-    board = fillBoardSimplified(simplifiedBoard);
-    return simplifiedBoard;
-    return
-}
-
-function hasHistory() {
-    if (history.length > 1) {
-        return true;
-    }
-    return false;
-}
-
-function getSimplifiedBoard() {
-    return displayBoard(board)
 }
 
 module.exports = {
-    getSimplifiedBoard,
-    actions,
-    move,
-    getNewActions,
-    getPreviousBoard,
-    hasHistory
+    Game
 }
