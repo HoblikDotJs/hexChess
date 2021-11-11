@@ -6,6 +6,7 @@ let actions;
 let highlighted = [];
 let clickedPiece, myColor;
 let pieces = {}
+let colorMult = 0;
 
 function preload() {
     pieces.bBishop = loadImage('https://upload.wikimedia.org/wikipedia/commons/8/81/Chess_bdt60.png');
@@ -24,7 +25,21 @@ function preload() {
 
 socket.on('board', msg => {
     board = msg;
+    if (myColor == "-") {
+        colorMult = 1
+        reverseBoard()
+    }
+
 })
+
+function reverseBoard() {
+    console.table(board);
+    board = board.reverse();
+    for (let i = 0; i < board.length; i++) {
+        board[i].reverse()
+    }
+    console.table(board);
+}
 
 socket.on('color', msg => {
     myColor = msg;
@@ -38,6 +53,15 @@ socket.on('color', msg => {
 
 socket.on('availableMoves', msg => {
     actions = msg;
+    for (let i = 0; i < actions.length; i++) {
+        actions[i].x = abs(7 * colorMult - actions[i].x)
+        actions[i].y = abs(7 * colorMult - actions[i].y)
+        for (let j = 0; j < actions[i].actions.length; j++) {
+            console.log(actions[i].actions[j].x)
+            actions[i].actions[j].x = abs(7 * colorMult - actions[i].actions[j].x)
+            actions[i].actions[j].y = abs(7 * colorMult - actions[i].actions[j].y)
+        }
+    }
 })
 
 function setup() {
@@ -159,13 +183,14 @@ function draw() {
 }
 
 function showAvailableMoves(x, y) {
+
     for (let action of actions) {
         if (action.x == x && action.y == y && board[y][x].slice(0, 1) == myColor) {
             highlighted = action.actions
             if (highlighted.length > 0) {
                 clickedPiece = {
-                    x,
-                    y
+                    x: abs(7 * colorMult - x),
+                    y: abs(7 * colorMult - y)
                 }
             }
         }
@@ -187,8 +212,8 @@ function mousePressed() {
             socket.emit('move', {
                 from: clickedPiece,
                 to: {
-                    x: obj.x,
-                    y: obj.y
+                    x: abs(7 * colorMult - obj.x),
+                    y: abs(7 * colorMult - obj.y)
                 }
             })
             readyToMove = false;
