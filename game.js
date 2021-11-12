@@ -1132,6 +1132,7 @@ class Game {
         let simplifiedBoard = this.history[this.history.length - 1];
         this.actions = this.actionHistory[this.actionHistory.length - 1];
         this.board = this.fillBoardSimplified(simplifiedBoard);
+        this.whoMoves *= -1;
         return simplifiedBoard;
     }
 

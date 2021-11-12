@@ -33,12 +33,12 @@ socket.on('board', msg => {
 })
 
 function reverseBoard() {
-    console.table(board);
+    //console.table(board);
     board = board.reverse();
     for (let i = 0; i < board.length; i++) {
         board[i].reverse()
     }
-    console.table(board);
+    //console.table(board);
 }
 
 socket.on('color', msg => {
@@ -57,7 +57,7 @@ socket.on('availableMoves', msg => {
         actions[i].x = abs(7 * colorMult - actions[i].x)
         actions[i].y = abs(7 * colorMult - actions[i].y)
         for (let j = 0; j < actions[i].actions.length; j++) {
-            console.log(actions[i].actions[j].x)
+            //console.log(actions[i].actions[j].x)
             actions[i].actions[j].x = abs(7 * colorMult - actions[i].actions[j].x)
             actions[i].actions[j].y = abs(7 * colorMult - actions[i].actions[j].y)
         }
@@ -220,6 +220,8 @@ function mousePressed() {
             setTimeout(() => readyToMove = true, 350);
             highlighted = []
             return
+        } else {
+            highlighted = []
         }
     }
     for (let y = 0; y < 8; y++) {
@@ -235,6 +237,7 @@ function mousePressed() {
             }
         }
     }
+
 }
 
 function hexagon(transX, transY, s, c) {

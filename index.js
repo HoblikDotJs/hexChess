@@ -31,6 +31,7 @@ io.on('connection', (socket) => {
         }
         socket.on('disconnect', () => {
             console.log('user disconnected');
+            //rewrite ID for disconnecting
         });
         socket.on('move', ({
             from,
