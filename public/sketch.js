@@ -7,6 +7,16 @@ let highlighted = [];
 let clickedPiece, myColor;
 let pieces = {}
 let colorMult = 0;
+let lastMove = {
+    from: {
+        x: 100,
+        y: 100
+    },
+    to: {
+        x: 100,
+        y: 100
+    }
+};
 
 function preload() {
     pieces.bBishop = loadImage('https://upload.wikimedia.org/wikipedia/commons/8/81/Chess_bdt60.png');
@@ -29,7 +39,10 @@ socket.on('board', msg => {
         colorMult = 1
         reverseBoard()
     }
+})
 
+socket.on('lastMove', msg => {
+    lastMove = msg;
 })
 
 function reverseBoard() {
@@ -112,7 +125,7 @@ function draw() {
                 let drawY = y * w * 1.05 + w / 2 + offset
                 let drawX = x * w * 0.9 + w / 2
                 fill(255)
-                hexagon(drawX, drawY, w * 0.004, colors[y % 3])
+                hexagon(drawX, drawY, w * 0.004, colors[y % 3], x, y)
                 let imgW = w * 0.9;
                 switch (board[y][x]) {
                     case "+R":
@@ -240,10 +253,12 @@ function mousePressed() {
 
 }
 
-function hexagon(transX, transY, s, c) {
+function hexagon(transX, transY, s, c, x, y) {
     stroke(255);
     strokeWeight(5);
     fill(c);
+    console.log()
+    if ((abs(7 * colorMult - lastMove.from.x) == x && abs(7 * colorMult - lastMove.from.y) == y) || (abs(7 * colorMult - lastMove.to.x) == x && abs(7 * colorMult - lastMove.to.y) == y)) fill(150, 255, 150)
     push();
     translate(transX, transY);
     scale(s);

@@ -5,9 +5,6 @@ const path = require('path');
 const {
     Game
 } = require('./game');
-const {
-    Room
-} = require('./room');
 const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
@@ -24,14 +21,22 @@ io.on('connection', (socket) => {
         }
         games[id].setId(socket.id)
         if (games[id].idWhite && games[id].idBlack) {
+            if (games[id].lastMove) io.in(id).emit('lastMove', games[id].lastMove);
             io.to(games[id].idWhite).emit('color', 1)
             io.to(games[id].idBlack).emit('color', -1)
             io.in(id).emit('board', games[id].getSimplifiedBoard());
             io.in(id).emit('availableMoves', games[id].getNewActions());
         }
         socket.on('disconnect', () => {
+            if (games[id].idWhite == socket.id) {
+                console.log("changing white")
+                games[id].resetId(1);
+            }
+            if (games[id].idBlack == socket.id) {
+                console.log("changing black")
+                games[id].resetId(-1)
+            }
             console.log('user disconnected');
-            //rewrite ID for disconnecting
         });
         socket.on('move', ({
             from,
@@ -42,6 +47,14 @@ io.on('connection', (socket) => {
                 io.in(id).emit('board', newBoard);
                 let newActions = games[id].getNewActions();
                 io.in(id).emit('availableMoves', newActions);
+                io.in(id).emit('lastMove', {
+                    from,
+                    to
+                });
+                games[id].lastMove = {
+                    from,
+                    to
+                }
             }
         });
         socket.on('undo', () => {

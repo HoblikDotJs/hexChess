@@ -1316,7 +1316,18 @@ class Game {
         if (!this.idWhite) {
             this.idWhite = id;
         } else {
-            this.idBlack = id;
+            if (!this.idBlack) {
+                this.idBlack = id;
+            }
+        }
+    }
+
+    resetId(mark) {
+        if (mark == 1) {
+            this.idWhite = "";
+        }
+        if (mark == -1) {
+            this.idBlack = "";
         }
     }
 
