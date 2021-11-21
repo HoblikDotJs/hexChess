@@ -1110,6 +1110,7 @@ class Game {
         this.history = [this.simplifiedBoard];
         this.actions = this.getActions(this.board);
         this.actionHistory = [this.actions]
+        this.lastMoveHistory = [];
         this.idWhite = "";
         this.idBlack = "";
         this.whoMoves = 1;
@@ -1232,7 +1233,11 @@ class Game {
                 if (y == 0 || y == 7) {
                     switch (x) {
                         case 0:
-                            board[y][x].piece = new Rook(x, y, y == 0 ? -1 : 1)
+                            if (y == 0) {
+                                board[y][x].piece = new Rook(x, y, -1)
+                            } else {
+                                board[y][x].piece = new InvertedRook(x, y, 1)
+                            }
                             break;
                         case 1:
                             board[y][x].piece = new Knight(x, y, y == 0 ? -1 : 1)
@@ -1253,7 +1258,11 @@ class Game {
                             board[y][x].piece = new Knight(x, y, y == 0 ? -1 : 1)
                             break;
                         case 7:
-                            board[y][x].piece = new InvertedRook(x, y, y == 0 ? -1 : 1)
+                            if (y == 0) {
+                                board[y][x].piece = new InvertedRook(x, y, -1);
+                            } else {
+                                board[y][x].piece = new Rook(x, y, 1)
+                            }
                             break;
                     }
                 }
@@ -1339,6 +1348,90 @@ class Game {
             return true;
         }
         return false;
+    }
+
+    getLastMove() {
+        if (this.lastMoveHistory.length > 0) {
+            return this.lastMoveHistory[this.lastMoveHistory.length - 1]
+        }
+        return {
+            from: {
+                x: 100,
+                y: 100
+            },
+            to: {
+                x: 100,
+                y: 100
+            }
+        }
+    }
+
+    setLastMove(newMove) {
+        this.lastMoveHistory.push(newMove)
+    }
+
+    getPreviousMove() {
+        if (this.lastMoveHistory.length > 1) {
+            this.lastMoveHistory.pop()
+            return this.lastMoveHistory[this.lastMoveHistory.length - 1]
+        }
+        return {
+            from: {
+                x: 100,
+                y: 100
+            },
+            to: {
+                x: 100,
+                y: 100
+            }
+        }
+    }
+
+    newUndoRequest(id) {
+        if (!this.undoRequest) {
+            this.undoRequest = id;
+            return false;
+        }
+        if (this.undoRequest != id) {
+            this.undoRequest = false;
+            return true;
+        }
+    }
+
+    newGameRequest(id) {
+        if (!this.newGame) {
+            this.newGame = id;
+            return false;
+        }
+        if (this.newGame != id) {
+            this.newGame = false;
+            this.board = this.makeBoard();
+            this.board = this.fillBoard(this.board);
+            this.updateAvailableMoves(this.board);
+            this.simplifiedBoard = this.displayBoard(this.board);
+            this.history = [this.simplifiedBoard];
+            this.actions = this.getActions(this.board);
+            this.actionHistory = [this.actions]
+            this.lastMoveHistory = [];
+            this.whoMoves = 1;
+            return true;
+        }
+    }
+
+    flipColors() {
+        let placeholder = this.idBlack;
+        this.idBlack = this.idWhite;
+        this.idWhite = placeholder;
+    }
+
+    flipColorsRequest(id) {
+        if (!this.flipColorsReq) {
+            this.flipColorsReq = id;
+            return false;
+        }
+        if (this.flipColorsReq != id) {
+            return true;
+        }
     }
 }
 

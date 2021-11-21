@@ -9,3 +9,7 @@ button {
   width: 20vw;
   height: 3vh;
 }
+
+.active {
+  background-color: rgb(255, 150, 150);
+}

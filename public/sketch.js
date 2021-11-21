@@ -1,5 +1,6 @@
 var socket = io();
 let board;
+let button, button3, button4;
 let w;
 let offset
 let actions;
@@ -38,6 +39,8 @@ socket.on('board', msg => {
     if (myColor == "-") {
         colorMult = 1
         reverseBoard()
+    } else {
+        colorMult = 0
     }
 })
 
@@ -46,12 +49,10 @@ socket.on('lastMove', msg => {
 })
 
 function reverseBoard() {
-    //console.table(board);
     board = board.reverse();
     for (let i = 0; i < board.length; i++) {
         board[i].reverse()
     }
-    //console.table(board);
 }
 
 socket.on('color', msg => {
@@ -62,6 +63,14 @@ socket.on('color', msg => {
     if (msg == -1) {
         myColor = "-"
     }
+})
+
+socket.on('newGameReq', msg => {
+    button3.addClass('active')
+})
+
+socket.on('newGame', msg => {
+    button3.removeClass('active')
 })
 
 socket.on('availableMoves', msg => {
@@ -77,6 +86,22 @@ socket.on('availableMoves', msg => {
     }
 })
 
+socket.on('newUndoReq', () => {
+    button.addClass('active');
+})
+
+socket.on('stopUndoReq', () => {
+    button.removeClass('active');
+})
+
+socket.on('flipColorsReq', () => {
+    button4.addClass('active');
+})
+
+socket.on('stopFlipColorsReq', () => {
+    button4.removeClass('active');
+})
+
 function setup() {
     let roomId = new URLSearchParams(window.location.search).get("invite");
     if (roomId) {
@@ -85,7 +110,7 @@ function setup() {
     imageMode(CENTER);
     createCanvas(min(windowWidth, windowHeight), min(windowWidth, windowHeight) * 1.1);
     w = min(windowWidth, windowHeight) * 0.112
-    let button = createButton('UNDO')
+    button = createButton('UNDO')
     button.mousePressed(() => {
         socket.emit('undo');
         highlighted = []
@@ -107,6 +132,14 @@ function setup() {
             }
         })
     }
+    button3 = createButton('NEW GAME')
+    button3.mousePressed(() => {
+        socket.emit('newGame');
+    })
+    button4 = createButton('FLIP COLORS')
+    button4.mousePressed(() => {
+        socket.emit('flipColors');
+    })
 }
 
 function draw() {
@@ -196,7 +229,6 @@ function draw() {
 }
 
 function showAvailableMoves(x, y) {
-
     for (let action of actions) {
         if (action.x == x && action.y == y && board[y][x].slice(0, 1) == myColor) {
             highlighted = action.actions

@@ -47,26 +47,61 @@ io.on('connection', (socket) => {
                 io.in(id).emit('board', newBoard);
                 let newActions = games[id].getNewActions();
                 io.in(id).emit('availableMoves', newActions);
-                io.in(id).emit('lastMove', {
+                games[id].setLastMove({
                     from,
                     to
-                });
-                games[id].lastMove = {
-                    from,
-                    to
-                }
+                })
+                let lastMove = games[id].getLastMove()
+                io.in(id).emit('lastMove', lastMove);
             }
         });
         socket.on('undo', () => {
-            if (games[id].hasHistory()) {
-                let newBoard = games[id].getPreviousBoard();
-                io.in(id).emit('board', newBoard);
-                let newActions = games[id].getNewActions()
-                io.in(id).emit('availableMoves', newActions);
+            io.in(id).emit('newUndoReq');
+            if (games[id].newUndoRequest(socket.id)) {
+                if (games[id].hasHistory()) {
+                    let newBoard = games[id].getPreviousBoard();
+                    io.in(id).emit('board', newBoard);
+                    let newActions = games[id].getNewActions()
+                    io.in(id).emit('availableMoves', newActions);
+                    let newLastMove = games[id].getPreviousMove();
+                    io.in(id).emit('lastMove', newLastMove);
+                }
+                io.in(id).emit('stopUndoReq');
             }
-        })
+        });
+        socket.on('newGame', () => {
+            io.in(id).emit('newGameReq');
+            if (games[id].newGameRequest(socket.id)) {
+                io.in(id).emit('lastMove', {
+                    from: {
+                        x: 100,
+                        y: 100
+                    },
+                    to: {
+                        x: 100,
+                        y: 100
+                    }
+                });
+                io.in(id).emit('board', games[id].getSimplifiedBoard());
+                io.in(id).emit('availableMoves', games[id].getNewActions());
+                io.in(id).emit('newGame');
+            }
+        });
+        socket.on('flipColors', () => {
+            io.in(id).emit('flipColorsReq');
+            if (games[id].flipColorsRequest(socket.id)) {
+                games[id].flipColors();
+                io.to(games[id].idWhite).emit('color', 1)
+                io.to(games[id].idBlack).emit('color', -1)
+                io.in(id).emit('board', games[id].getSimplifiedBoard());
+                io.in(id).emit('availableMoves', games[id].getNewActions());
+                //if (games[id].lastMove) io.in(id).emit('lastMove', games[id].lastMove);
+                io.in(id).emit('stopFlipColorsReq');
+            }
+        });
     })
 });
 
+// queue
 const PORT = 8080
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
