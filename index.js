@@ -101,7 +101,7 @@ io.on('connection', (socket) => {
         });
     })
 });
-
+// bug flip colors
 // queue
 const PORT = 8080
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));

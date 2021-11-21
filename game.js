@@ -1430,6 +1430,7 @@ class Game {
             return false;
         }
         if (this.flipColorsReq != id) {
+            this.flipColorsReq = false;
             return true;
         }
     }
