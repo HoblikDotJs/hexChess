@@ -1102,7 +1102,7 @@ function isOdd(x) {
 }
 
 class Game {
-    constructor() {
+    constructor(index) {
         this.board = this.makeBoard();
         this.board = this.fillBoard(this.board);
         this.updateAvailableMoves(this.board);
@@ -1114,6 +1114,32 @@ class Game {
         this.idWhite = "";
         this.idBlack = "";
         this.whoMoves = 1;
+        this.lastTimePassed = 0
+        this.startClock(index)
+    }
+
+    startClock(index) {
+        switch (index) {
+            case 0:
+                this.timeBlack = 120 * 1000;
+                this.timeWhite = 120 * 1000;
+                this.increasement = 1 * 1000;
+                break;
+            case 1:
+                this.timeBlack = 300 * 1000;
+                this.timeWhite = 300 * 1000;
+                this.increasement = 0 * 1000;
+                break;
+            case 2:
+                return;
+        }
+    }
+
+    getTimes() {
+        return {
+            black: this.timeBlack,
+            white: this.timeWhite
+        }
     }
 
     hasHistory() {
@@ -1187,6 +1213,17 @@ class Game {
         this.actionHistory.push(this.actions);
         let newBoard = this.displayBoard(this.board);
         this.history.push(newBoard);
+        if (this.whoMoves == 1) {
+            let timePassed = this.lastBlackMove ? Date.now() - this.lastBlackMove : 0;
+            timePassed -= this.increasement;
+            this.lastWhiteMove = Date.now();
+            this.timeWhite -= timePassed;
+        } else {
+            let timePassed = this.lastWhiteMove ? Date.now() - this.lastWhiteMove : 0;
+            timePassed -= this.increasement;
+            this.lastBlackMove = Date.now();
+            this.timeBlack -= timePassed;
+        }
         this.whoMoves *= -1;
         return newBoard;
     }

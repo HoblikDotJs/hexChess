@@ -1,13 +1,19 @@
 var socket = io();
 let board;
 let button, button3, button4;
+let button5_1 = false,
+    button5_2 = false,
+    button5_3 = false,
+    myTime,
+    enemyTime;
 let w;
-let offset
+let offset;
 let actions;
 let highlighted = [];
 let clickedPiece, myColor;
 let pieces = {}
 let colorMult = 0;
+let weAreOnMove = false;
 let lastMove = {
     from: {
         x: 100,
@@ -102,10 +108,85 @@ socket.on('stopFlipColorsReq', () => {
     button4.removeClass('active');
 })
 
+socket.on('joinGameFromQueue', ({
+    id,
+    index
+}) => {
+    if (board) {
+        window.location.href = window.location.origin + `?invite=${id}&index=${index}`
+    }
+    socket.emit('joinRoom', {
+        id,
+        index
+    });
+})
+
+socket.on('roomFill', (arr) => {
+    if (button5_1 && button5_2 && button5_3) {
+        button5_1.html(`2+1 (${arr[0]})`)
+        button5_2.html(`5+0 (${arr[1]})`)
+        button5_3.html(`unlimited (${arr[2]})`)
+    }
+})
+
+socket.on('joinQueuesReq', (index) => {
+    switch (index) {
+        case 0:
+            button5_1.addClass('active');
+            break;
+        case 1:
+            button5_2.addClass('active');
+            break;
+        case 2:
+            button5_3.addClass('active');
+            break;
+    }
+})
+
+socket.on('stopQueuesReq', () => {
+    button5_1.removeClass('active');
+    button5_2.removeClass('active');
+    button5_3.removeClass('active');
+})
+
+socket.on('updateTime', (times) => {
+    if (myColor == "+") {
+        myTime = times.white;
+        enemyTime = times.black;
+    }
+    if (myColor == "-") {
+        myTime = times.black;
+        enemyTime = times.white;
+    }
+})
+
+socket.on('onMove', (col) => {
+    weAreOnMove = false;
+    if (myColor == "+" && col == 1) {
+        weAreOnMove = true;
+    }
+    if (myColor == "-" && col == -1) {
+        weAreOnMove = true;
+    }
+})
+
+
 function setup() {
-    let roomId = new URLSearchParams(window.location.search).get("invite");
-    if (roomId) {
-        socket.emit('joinRoom', roomId)
+    let Params = new URLSearchParams(window.location.search)
+    let roomId = Params.get("invite");
+    let queue = Params.get("index");
+    if (queue) {
+        socket.emit('joinRoom', {
+            id: roomId,
+            index: queue
+        })
+        window.history.pushState({}, document.title, "/");
+    } else if (roomId) {
+        socket.emit('joinRoom', {
+            id: roomId,
+            index: 2
+        })
+        window.history.pushState({}, document.title, "/");
     }
     imageMode(CENTER);
     createCanvas(min(windowWidth, windowHeight), min(windowWidth, windowHeight) * 1.1);
@@ -118,7 +199,10 @@ function setup() {
     if (!roomId) {
         let button2 = createButton('INVITE')
         button2.mousePressed(() => {
-            socket.emit('joinRoom', "room" + socket.id);
+            socket.emit('joinRoom', {
+                id: "room" + socket.id,
+                index: 2
+            });
             if (navigator.share) {
                 navigator.share({
                         title: document.title,
@@ -140,6 +224,39 @@ function setup() {
     button4.mousePressed(() => {
         socket.emit('flipColors');
     })
+    button5_1 = createButton('2+1')
+    button5_1.mousePressed(() => {
+        socket.emit('joinQueues', 0);
+    })
+    button5_2 = createButton('5+0')
+    button5_2.mousePressed(() => {
+        socket.emit('joinQueues', 1);
+    })
+    button5_3 = createButton('unlimited')
+    button5_3.mousePressed(() => {
+        socket.emit('joinQueues', 2);
+    })
+    let myTimer = createElement('h2')
+    let enemyTimer = createElement('h2')
+    let timerSpeed = 90;
+    setInterval(() => {
+        if (!myTime) return
+        if (weAreOnMove) {
+            myTime -= timerSpeed
+        } else {
+            enemyTime -= timerSpeed
+        }
+        myTimer.html(formatTime(myTime));
+        enemyTimer.html(formatTime(enemyTime));
+    }, timerSpeed)
+}
+
+function formatTime(time) {
+    let msec = floor(nf(time % 100, 1, 0) / 10)
+    let sec = nf(floor((time / 1000) % 60), 2, 0);
+    let min = nf(floor((time / 1000) / 60), 2, 0);
+    //let hrs = floor(min / 60);
+    return `${min}:${sec}:${msec}`
 }
 
 function draw() {

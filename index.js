@@ -2,6 +2,7 @@ const http = require('http');
 const express = require('express')
 const socketio = require('socket.io');
 const path = require('path');
+const uniqid = require('uniqid');
 const {
     Game
 } = require('./game');
@@ -11,13 +12,30 @@ const io = socketio(server);
 app.use(express.static(path.join(__dirname, 'public')));
 
 let games = {}
-
+let queues = [
+    [],
+    [],
+    []
+];
+let onlinePlayers = 0;
 io.on('connection', (socket) => {
-    socket.on('joinRoom', (id) => {
+    onlinePlayers++;
+    console.log(onlinePlayers)
+    socket.on('joinRoom', ({
+        id,
+        index //timeIndex
+    }) => {
+        index = parseInt(index)
+        for (game in games) {
+            if (games[game].idWhite == socket.id || games[game].idBlack == socket.id) {
+                delete games[game];
+                console.log('deleting game: ' + game)
+            }
+        }
         console.log('user ' + socket.id + ' joined ' + id)
         socket.join(id)
         if (!games[id]) {
-            games[id] = new Game();
+            games[id] = new Game(index);
         }
         games[id].setId(socket.id)
         if (games[id].idWhite && games[id].idBlack) {
@@ -27,17 +45,6 @@ io.on('connection', (socket) => {
             io.in(id).emit('board', games[id].getSimplifiedBoard());
             io.in(id).emit('availableMoves', games[id].getNewActions());
         }
-        socket.on('disconnect', () => {
-            if (games[id].idWhite == socket.id) {
-                console.log("changing white")
-                games[id].resetId(1);
-            }
-            if (games[id].idBlack == socket.id) {
-                console.log("changing black")
-                games[id].resetId(-1)
-            }
-            console.log('user disconnected');
-        });
         socket.on('move', ({
             from,
             to
@@ -53,7 +60,26 @@ io.on('connection', (socket) => {
                 })
                 let lastMove = games[id].getLastMove()
                 io.in(id).emit('lastMove', lastMove);
+                let times = games[id].getTimes();
+                console.log(times)
+                io.in(id).emit('updateTime', times);
+                io.in(id).emit('onMove', games[id].whoMoves);
             }
+        });
+        socket.on('disconnect', () => {
+            if (games[id].idWhite == socket.id) {
+                console.log("changing white")
+                games[id].resetId(1);
+            }
+            if (games[id].idBlack == socket.id) {
+                console.log("changing black")
+                games[id].resetId(-1)
+            }
+            if (!games[id].idWhite && !games[id].idBlack) {
+                delete games[id];
+                console.log('deleted')
+            }
+            console.log('user disconnected');
         });
         socket.on('undo', () => {
             io.in(id).emit('newUndoReq');
@@ -95,13 +121,62 @@ io.on('connection', (socket) => {
                 io.to(games[id].idBlack).emit('color', -1)
                 io.in(id).emit('board', games[id].getSimplifiedBoard());
                 io.in(id).emit('availableMoves', games[id].getNewActions());
-                //if (games[id].lastMove) io.in(id).emit('lastMove', games[id].lastMove);
                 io.in(id).emit('stopFlipColorsReq');
             }
         });
+    });
+    socket.on('joinQueues', (index) => {
+        if (queues[index].includes(socket.id)) {
+            queues[index].splice(queues[index].indexOf(socket.id, 1))
+            io.to(socket.id).emit('stopQueuesReq', index);
+            io.emit('roomFill', [queues[0].length, queues[1].length, queues[2].length]);
+            return
+        }
+        if (index <= queues.length - 1) {
+            console.log('user ' + socket.id + ' joined queue ' + index);
+            queues[index].push(socket.id);
+            io.emit('roomFill', [queues[0].length, queues[1].length, queues[2].length]);
+            io.to(socket.id).emit('joinQueuesReq', index);
+
+            if (queues[index].length > 1) {
+                console.log("two players waiting in:" + index)
+                let roomid = uniqid()
+                let id1 = queues[index][0];
+                let id2 = queues[index][1]
+                io.to(id1).emit('joinGameFromQueue', {
+                    id: roomid,
+                    index
+                });
+                io.to(id2).emit('joinGameFromQueue', {
+                    id: roomid,
+                    index
+                });
+                io.to(id1).emit('stopQueuesReq');
+                io.to(id2).emit('stopQueuesReq');
+                for (let i = queues.length - 1; i > 0; i--) {
+                    if (i != index) {
+                        if (queues[i].includes(id1)) {
+                            queues[i].splice(queues[i].indexOf(id1, 1))
+                            console.log("1: " + id1)
+                        }
+                        if (queues[i].includes(id2)) {
+                            queues[i].splice(queues[i].indexOf(id2, 1))
+                            console.log("2: " + id2)
+                        }
+                    }
+                }
+                queues[index].shift()
+                queues[index].shift()
+                io.emit('roomFill', [queues[0].length, queues[1].length, queues[2].length]);
+            }
+        }
     })
-});
-// bug flip colors
-// queue
+    socket.on('disconnect', () => {
+        onlinePlayers--;
+        console.log(onlinePlayers);
+    });
+    io.emit('roomFill', [queues[0].length, queues[1].length, queues[2].length]);
+})
+// crashes after changing tempo
 const PORT = 8080
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
