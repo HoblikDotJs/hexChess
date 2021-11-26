@@ -26,12 +26,6 @@ io.on('connection', (socket) => {
         index //timeIndex
     }) => {
         index = parseInt(index)
-        for (game in games) {
-            if (games[game].idWhite == socket.id || games[game].idBlack == socket.id) {
-                delete games[game];
-                console.log('deleting game: ' + game)
-            }
-        }
         console.log('user ' + socket.id + ' joined ' + id)
         socket.join(id)
         if (!games[id]) {
@@ -61,25 +55,26 @@ io.on('connection', (socket) => {
                 let lastMove = games[id].getLastMove()
                 io.in(id).emit('lastMove', lastMove);
                 let times = games[id].getTimes();
-                console.log(times)
                 io.in(id).emit('updateTime', times);
                 io.in(id).emit('onMove', games[id].whoMoves);
             }
         });
         socket.on('disconnect', () => {
-            if (games[id].idWhite == socket.id) {
-                console.log("changing white")
-                games[id].resetId(1);
+            if (games[id] != undefined) {
+                if (games[id].idWhite == socket.id) {
+                    console.log("changing white")
+                    games[id].resetId(1);
+                }
+                if (games[id].idBlack == socket.id) {
+                    console.log("changing black")
+                    games[id].resetId(-1)
+                }
+                if (!games[id].idWhite && !games[id].idBlack) {
+                    delete games[id];
+                    console.log('deleted')
+                }
+                console.log('user disconnected');
             }
-            if (games[id].idBlack == socket.id) {
-                console.log("changing black")
-                games[id].resetId(-1)
-            }
-            if (!games[id].idWhite && !games[id].idBlack) {
-                delete games[id];
-                console.log('deleted')
-            }
-            console.log('user disconnected');
         });
         socket.on('undo', () => {
             io.in(id).emit('newUndoReq');
@@ -142,7 +137,34 @@ io.on('connection', (socket) => {
                 console.log("two players waiting in:" + index)
                 let roomid = uniqid()
                 let id1 = queues[index][0];
-                let id2 = queues[index][1]
+                let id2 = queues[index][1];
+                let keys = Object.keys(games);
+                /*for (let i = keys.length - 1; i >= 0; i--) {
+                    if (games[keys[i]].idWhite == id1 || games[keys[i]].idBlack == id1) {
+                        delete games[keys[i]];
+                        keys.splice(i, 1)
+                        console.log('deleting game: ' + keys[i])
+                    }
+                }
+                for (let i = keys.length - 1; i >= 0; i--) {
+                    if (games[keys[i]].idWhite == id2 || games[keys[i]].idBlack == id2) {
+                        delete games[keys[i]];
+                        keys.splice(i, 1)
+                        console.log('deleting game: ' + keys[i])
+                    }
+                }*/
+                for (game in games) {
+                    if (games[game].idWhite == id1 || games[game].idBlack == id1) {
+                        delete games[game];
+                        console.log('deleting game: ' + game)
+                    }
+                }
+                for (game in games) {
+                    if (games[game].idWhite == id2 || games[game].idBlack == id2) {
+                        delete games[game];
+                        console.log('deleting game: ' + game)
+                    }
+                }
                 io.to(id1).emit('joinGameFromQueue', {
                     id: roomid,
                     index
@@ -153,7 +175,7 @@ io.on('connection', (socket) => {
                 });
                 io.to(id1).emit('stopQueuesReq');
                 io.to(id2).emit('stopQueuesReq');
-                for (let i = queues.length - 1; i > 0; i--) {
+                for (let i = queues.length - 1; i >= 0; i--) {
                     if (i != index) {
                         if (queues[i].includes(id1)) {
                             queues[i].splice(queues[i].indexOf(id1, 1))
