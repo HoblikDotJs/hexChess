@@ -13,3 +13,7 @@ button {
 .active {
   background-color: rgb(255, 150, 150);
 }
+
+.timeOver {
+  color: red;
+}

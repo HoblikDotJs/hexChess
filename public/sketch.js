@@ -1,9 +1,9 @@
 var socket = io();
 let board;
-let button, button3, button4;
-let button5_1 = false,
-    button5_2 = false,
-    button5_3 = false,
+let button_undo, button_newGame, button_flipColors;
+let button_temp0 = false,
+    button_temp1 = false,
+    button_temp2 = false,
     myTime,
     enemyTime;
 let w;
@@ -48,6 +48,7 @@ socket.on('board', msg => {
     } else {
         colorMult = 0
     }
+    highlighted = []
 })
 
 socket.on('lastMove', msg => {
@@ -72,11 +73,11 @@ socket.on('color', msg => {
 })
 
 socket.on('newGameReq', msg => {
-    button3.addClass('active')
+    button_newGame.addClass('active')
 })
 
 socket.on('newGame', msg => {
-    button3.removeClass('active')
+    button_newGame.removeClass('active')
 })
 
 socket.on('availableMoves', msg => {
@@ -93,19 +94,19 @@ socket.on('availableMoves', msg => {
 })
 
 socket.on('newUndoReq', () => {
-    button.addClass('active');
+    button_undo.addClass('active');
 })
 
 socket.on('stopUndoReq', () => {
-    button.removeClass('active');
+    button_undo.removeClass('active');
 })
 
 socket.on('flipColorsReq', () => {
-    button4.addClass('active');
+    button_flipColors.addClass('active');
 })
 
 socket.on('stopFlipColorsReq', () => {
-    button4.removeClass('active');
+    button_flipColors.removeClass('active');
 })
 
 socket.on('joinGameFromQueue', ({
@@ -122,31 +123,31 @@ socket.on('joinGameFromQueue', ({
 })
 
 socket.on('roomFill', (arr) => {
-    if (button5_1 && button5_2 && button5_3) {
-        button5_1.html(`2+1 (${arr[0]})`)
-        button5_2.html(`5+0 (${arr[1]})`)
-        button5_3.html(`unlimited (${arr[2]})`)
+    if (button_temp0 && button_temp1 && button_temp2) {
+        button_temp0.html(`2+1 (${arr[0]})`)
+        button_temp1.html(`5+0 (${arr[1]})`)
+        button_temp2.html(`unlimited (${arr[2]})`)
     }
 })
 
 socket.on('joinQueuesReq', (index) => {
     switch (index) {
         case 0:
-            button5_1.addClass('active');
+            button_temp0.addClass('active');
             break;
         case 1:
-            button5_2.addClass('active');
+            button_temp1.addClass('active');
             break;
         case 2:
-            button5_3.addClass('active');
+            button_temp2.addClass('active');
             break;
     }
 })
 
 socket.on('stopQueuesReq', () => {
-    button5_1.removeClass('active');
-    button5_2.removeClass('active');
-    button5_3.removeClass('active');
+    button_temp0.removeClass('active');
+    button_temp1.removeClass('active');
+    button_temp2.removeClass('active');
 })
 
 socket.on('updateTime', (times) => {
@@ -170,7 +171,6 @@ socket.on('onMove', (col) => {
     }
 })
 
-
 function setup() {
     let Params = new URLSearchParams(window.location.search)
     let roomId = Params.get("invite");
@@ -191,8 +191,8 @@ function setup() {
     imageMode(CENTER);
     createCanvas(min(windowWidth, windowHeight), min(windowWidth, windowHeight) * 1.1);
     w = min(windowWidth, windowHeight) * 0.112
-    button = createButton('UNDO')
-    button.mousePressed(() => {
+    button_undo = createButton('UNDO')
+    button_undo.mousePressed(() => {
         socket.emit('undo');
         highlighted = []
     })
@@ -216,35 +216,45 @@ function setup() {
             }
         })
     }
-    button3 = createButton('NEW GAME')
-    button3.mousePressed(() => {
+    button_newGame = createButton('NEW GAME')
+    button_newGame.mousePressed(() => {
         socket.emit('newGame');
     })
-    button4 = createButton('FLIP COLORS')
-    button4.mousePressed(() => {
+    button_flipColors = createButton('FLIP COLORS')
+    button_flipColors.mousePressed(() => {
         socket.emit('flipColors');
     })
-    button5_1 = createButton('2+1')
-    button5_1.mousePressed(() => {
+    button_temp0 = createButton('2+1')
+    button_temp0.mousePressed(() => {
         socket.emit('joinQueues', 0);
     })
-    button5_2 = createButton('5+0')
-    button5_2.mousePressed(() => {
+    button_temp1 = createButton('5+0')
+    button_temp1.mousePressed(() => {
         socket.emit('joinQueues', 1);
     })
-    button5_3 = createButton('unlimited')
-    button5_3.mousePressed(() => {
+    button_temp2 = createButton('unlimited')
+    button_temp2.mousePressed(() => {
         socket.emit('joinQueues', 2);
     })
     let myTimer = createElement('h2')
     let enemyTimer = createElement('h2')
     let timerSpeed = 90;
-    setInterval(() => {
+    let timeInterval = setInterval(() => {
         if (!myTime) return
         if (weAreOnMove) {
-            myTime -= timerSpeed
+            if (myTime > 0) myTime -= timerSpeed
         } else {
-            enemyTime -= timerSpeed
+            if (enemyTime > 0) enemyTime -= timerSpeed
+        }
+        if (myTime <= 0) {
+            myTimer.addClass('timeOver')
+            clearInterval(timeInterval);
+            myTime = 0
+        }
+        if (enemyTime <= 0) {
+            enemyTimer.addClass('timeOver')
+            clearInterval(timeInterval);
+            enemyTime = 0;
         }
         myTimer.html(formatTime(myTime));
         enemyTimer.html(formatTime(enemyTime));
@@ -255,7 +265,6 @@ function formatTime(time) {
     let msec = floor(nf(time % 100, 1, 0) / 10)
     let sec = nf(floor((time / 1000) % 60), 2, 0);
     let min = nf(floor((time / 1000) / 60), 2, 0);
-    //let hrs = floor(min / 60);
     return `${min}:${sec}:${msec}`
 }
 

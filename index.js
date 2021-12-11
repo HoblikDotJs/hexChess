@@ -106,6 +106,8 @@ io.on('connection', (socket) => {
                 io.in(id).emit('board', games[id].getSimplifiedBoard());
                 io.in(id).emit('availableMoves', games[id].getNewActions());
                 io.in(id).emit('newGame');
+                let times = games[id].getTimes();
+                io.in(id).emit('updateTime', times);
             }
         });
         socket.on('flipColors', () => {
@@ -196,9 +198,17 @@ io.on('connection', (socket) => {
     socket.on('disconnect', () => {
         onlinePlayers--;
         console.log(onlinePlayers);
+        console.log(Object.keys(games))
     });
     io.emit('roomFill', [queues[0].length, queues[1].length, queues[2].length]);
 })
-// crashes after changing tempo
+//TODO:
+// 
+//
+//
+//-------------------------------------------------
+//flip colors doesnt flip players timers - problem?
+//players have different colors on board - problem?
+
 const PORT = 8080
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
