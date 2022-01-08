@@ -1,10 +1,16 @@
 body {
   background: #161512 linear-gradient(to bottom, #2e2a24, #161512 116px)
     no-repeat;
-  overflow-x: hidden;
   --site-header-height: 0px;
   --site-header-margin: 0px;
   --board-scale: 1;
+  overflow-x: hidden;
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Old versions of Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
 }
 .main-board {
   position: relative;
@@ -61,6 +67,7 @@ body {
 }
 
 @media (min-width: 800px), (orientation: landscape) {
+  /*landsape tablet?? */
   .round {
     grid-template-columns: 1fr 1fr;
     grid-template-rows: auto fit-content(0) fit-content(0);
@@ -90,6 +97,7 @@ body {
 }
 
 @media (min-width: 1260px) {
+  /* tablet, pc */
   .round {
     grid-template-columns:
       minmax(230px, 20vw) minmax(
@@ -105,21 +113,30 @@ body {
 }
 
 @media (max-width: 799px) and (orientation: landscape) {
+  /* landscape phone*/
+  body {
+    --board-scale: 0.8;
+  }
   .round__app {
     grid-template-columns:
       minmax(
         calc(55vmin),
         calc(
           100vh - calc(var(--site-header-height) + var(--site-header-margin)) -
-            2vmin
+            5vmin
         )
       )
       minmax(200px, 240px);
     grid-column-gap: 3vmin;
   }
+  img {
+    height: 45px;
+    width: 45px;
+  }
 }
 
 @media (max-width: 799px) and (orientation: portrait) {
+  /* portrait phone */
   .rclock {
     justify-self: flex-end;
     z-index: 1;
@@ -139,5 +156,24 @@ body {
       100vh - calc(var(--site-header-height) + var(--site-header-margin)) -
         100px - 3.5em
     );
+  }
+  img {
+    height: 35px;
+    width: 35px;
+  }
+  button {
+    margin-left: 5vw;
+    margin-top: -1vh;
+  }
+  .rclock .time {
+    background: #2624212a;
+  }
+
+  .rclock-top {
+    margin-top: -1vh;
+  }
+
+  .rclock-bottom {
+    margin-top: 1vh;
   }
 }

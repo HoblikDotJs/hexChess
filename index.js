@@ -127,7 +127,7 @@ io.on('connection', (socket) => {
     socket.on('joinQueues', (index) => {
         if (queues[index].includes(socket.id)) {
             queues[index].splice(queues[index].indexOf(socket.id, 1))
-            io.to(socket.id).emit('stopQueuesReq', index);
+            //io.to(socket.id).emit('stopQueuesReq', index);
             io.emit('roomFill', [queues[0].length, queues[1].length, queues[2].length]);
             return
         }

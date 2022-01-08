@@ -73,11 +73,16 @@ socket.on('color', msg => {
 })
 
 socket.on('newGameReq', msg => {
-    button_newGame.addClass('active')
+    if (button_newGame.hasClass('active')) {
+        button_newGame.addClass('waiting');
+    } else {
+        button_newGame.toggleClass('waiting');
+    }
 })
 
 socket.on('newGame', msg => {
     button_newGame.removeClass('active')
+    button_newGame.removeClass('waiting')
 })
 
 socket.on('availableMoves', msg => {
@@ -94,19 +99,29 @@ socket.on('availableMoves', msg => {
 })
 
 socket.on('newUndoReq', () => {
-    button_undo.addClass('active');
+    if (button_undo.hasClass('active')) {
+        button_undo.addClass('waiting');
+    } else {
+        button_undo.toggleClass('waiting');
+    }
 })
 
 socket.on('stopUndoReq', () => {
     button_undo.removeClass('active');
+    button_undo.removeClass('waiting');
 })
 
 socket.on('flipColorsReq', () => {
-    button_flipColors.addClass('active');
+    if (button_flipColors.hasClass('active')) {
+        button_flipColors.addClass('waiting');
+    } else {
+        button_flipColors.toggleClass('waiting');
+    }
 })
 
 socket.on('stopFlipColorsReq', () => {
     button_flipColors.removeClass('active');
+    button_flipColors.removeClass('waiting');
 })
 
 socket.on('joinGameFromQueue', ({
@@ -124,9 +139,24 @@ socket.on('joinGameFromQueue', ({
 
 socket.on('roomFill', (arr) => {
     if (button_temp0 && button_temp1 && button_temp2) {
-        button_temp0.html(`2+1 (${arr[0]})`)
+        if (arr[0] && !button_temp0.hasClass("active")) {
+            button_temp0.addClass("waiting");
+        } else {
+            button_temp0.removeClass("waiting")
+        }
+        if (arr[1] && !button_temp1.hasClass("active")) {
+            button_temp1.addClass("waiting");
+        } else {
+            button_temp1.removeClass("waiting")
+        }
+        if (arr[2] && !button_temp2.hasClass("active")) {
+            button_temp2.addClass("waiting");
+        } else {
+            button_temp2.removeClass("waiting")
+        }
+        /*button_temp0.html(`2+1 (${arr[0]})`)
         button_temp1.html(`5+0 (${arr[1]})`)
-        button_temp2.html(`unlimited (${arr[2]})`)
+        button_temp2.html(`unlimited (${arr[2]})`)*/
     }
 })
 
@@ -171,7 +201,6 @@ socket.on('onMove', (col) => {
     }
 })
 
-
 function windowResized() {
     let canvasDiv = select('#canvasDiv');
     let canvasWidth = canvasDiv.width;
@@ -179,7 +208,6 @@ function windowResized() {
     resizeCanvas(canvasWidth, canvasHeight);
     w = canvasWidth * 0.112
 }
-
 
 function setup() {
     let Params = new URLSearchParams(window.location.search)
@@ -201,13 +229,14 @@ function setup() {
     imageMode(CENTER);
     createCanvas(1, 1).parent("canvasDiv");
     windowResized();
-    button_undo = createButton('UNDO').parent("downButtons")
+    button_undo = createButton("<img src='/icons/undo.svg'>").parent("downButtons")
     button_undo.mousePressed(() => {
         socket.emit('undo');
         highlighted = []
+        if (board) button_undo.toggleClass("active")
     })
     if (!roomId) {
-        let button2 = createButton('INVITE').parent("downButtons")
+        let button2 = createButton("<img src='/icons/invite.svg' style='display:none;'>") //.parent("downButtons") TODO:
         button2.mousePressed(() => {
             socket.emit('joinRoom', {
                 id: "room" + socket.id,
@@ -226,25 +255,30 @@ function setup() {
             }
         })
     }
-    button_newGame = createButton('REMATCH').parent("downButtons")
+    button_newGame = createButton("<img src='/icons/rematch.svg'>").parent("downButtons")
     button_newGame.mousePressed(() => {
         socket.emit('newGame');
+        if (board) button_newGame.toggleClass("active")
     })
-    button_flipColors = createButton('FLIP COLORS').parent("downButtons")
+    button_flipColors = createButton("<img src='/icons/swap.svg'>").parent("downButtons")
     button_flipColors.mousePressed(() => {
         socket.emit('flipColors');
+        if (board) button_flipColors.toggleClass("active");
     })
-    button_temp0 = createButton('2+1').parent("upButtons")
+    button_temp0 = createButton("<img src='/icons/fast.svg'>").parent("upButtons")
     button_temp0.mousePressed(() => {
         socket.emit('joinQueues', 0);
+        button_temp0.toggleClass("active");
     })
-    button_temp1 = createButton('5+0').parent("upButtons")
+    button_temp1 = createButton("<img src='/icons/slow.svg'>").parent("upButtons")
     button_temp1.mousePressed(() => {
         socket.emit('joinQueues', 1);
+        button_temp1.toggleClass("active");
     })
-    button_temp2 = createButton('unlimited').parent("upButtons")
+    button_temp2 = createButton("<img src='/icons/infinity.svg'>").parent("upButtons")
     button_temp2.mousePressed(() => {
         socket.emit('joinQueues', 2);
+        button_temp2.toggleClass("active");
     })
     let myTimer = select("#myTime")
     let enemyTimer = select("#enemyTime")
@@ -275,27 +309,27 @@ function formatTime(time) {
     let msec = floor(nf(time % 100, 1, 0) / 10)
     let sec = nf(floor((time / 1000) % 60), 2, 0);
     let min = nf(floor((time / 1000) / 60), 2, 0);
-    return `${min}:${sec}:${msec}`
+    return `${min}:${sec}.${msec}`
 }
 
 function draw() {
     clear();
     translate(w * 0.85, 0)
     noStroke()
-    if (board) {
-        for (let y = 0; y < 8; y++) {
-            for (let x = 0; x < 8; x++) {
-                offset = 0;
-                let colors = [255, 50, 125]
-                if (x % 2 != 0) {
-                    offset = w / 2
-                    colors = [125, 255, 50]
-                }
-                let drawY = y * w * 1.05 + w / 2 + offset
-                let drawX = x * w * 0.9 + w / 2
-                fill(255)
-                hexagon(drawX, drawY, w * 0.004, colors[y % 3], x, y)
-                let imgW = w * 0.9;
+    for (let y = 0; y < 8; y++) {
+        for (let x = 0; x < 8; x++) {
+            offset = 0;
+            let colors = [255, 50, 125]
+            if (x % 2 != 0) {
+                offset = w / 2
+                colors = [125, 255, 50]
+            }
+            let drawY = y * w * 1.05 + w / 2 + offset
+            let drawX = x * w * 0.9 + w / 2
+            fill(255)
+            hexagon(drawX, drawY, w * 0.004, colors[y % 3], x, y)
+            let imgW = w * 0.9;
+            if (board) {
                 switch (board[y][x]) {
                     case "+R":
                         image(pieces.wRook, drawX, drawY, imgW, imgW)
@@ -350,19 +384,20 @@ function draw() {
                 }
             }
         }
-        for (let obj of highlighted) {
-            offset = 0;
-            if (obj.x % 2 != 0) {
-                offset = w / 2
-            }
-            let drawY = obj.y * w * 1.05 + w / 2 + offset
-            let drawX = obj.x * w * 0.9 + w / 2
-            fill(255, 150, 150);
-            noStroke()
-            ellipse(drawX, drawY, w / 3)
+    }
+    for (let obj of highlighted) {
+        offset = 0;
+        if (obj.x % 2 != 0) {
+            offset = w / 2
         }
+        let drawY = obj.y * w * 1.05 + w / 2 + offset
+        let drawX = obj.x * w * 0.9 + w / 2
+        fill(255, 150, 150);
+        noStroke()
+        ellipse(drawX, drawY, w / 3)
     }
 }
+
 
 function showAvailableMoves(x, y) {
     for (let action of actions) {

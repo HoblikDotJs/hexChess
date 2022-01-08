@@ -1454,6 +1454,10 @@ class Game {
             this.undoRequest = id;
             return false;
         }
+        if (this.undoRequest == id) {
+            this.undoRequest = false;
+            return false;
+        }
         if (this.undoRequest != id) {
             this.undoRequest = false;
             return true;
@@ -1463,6 +1467,10 @@ class Game {
     newGameRequest(id) {
         if (!this.newGame) {
             this.newGame = id;
+            return false;
+        }
+        if (this.newGame == id) {
+            this.newGame = false;
             return false;
         }
         if (this.newGame != id) {
@@ -1497,10 +1505,15 @@ class Game {
             this.flipColorsReq = id;
             return false;
         }
+        if (this.flipColorsReq == id) {
+            this.flipColorsReq = false;
+            return false;
+        }
         if (this.flipColorsReq != id) {
             this.flipColorsReq = false;
             return true;
         }
+
     }
 
     evaluation(board) {

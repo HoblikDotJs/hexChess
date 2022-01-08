@@ -11,6 +11,11 @@
     <link rel="stylesheet" href="layout.css">
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-77HQXRXJ43"></script>
     <script>
+        window.oncontextmenu = function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            return false;
+        };
         window.dataLayer = window.dataLayer || [];
 
         function gtag() {
@@ -24,27 +29,26 @@
 
 <body>
     <div id="main-wrap">
-        <div class="round">
+        <div class="round" style="margin-top: 2vh;">
             <div class="round__app">
                 <div class="round__app__board main-board" id="canvasDiv">
                 </div>
                 <div class="round__app__table"></div>
-                <div class="ruser-top" id="upButtons">
-                    <name>
-                        .
+                <div class="ruser-top">
+                    <name id="upButtons">
+
                     </name>
                 </div>
-                <span data-icon=""></span>
-                <div class="ruser-bottom" id="downButtons">
-                    <name>
-                        .
+                <div class="ruser-bottom">
+                    <name id="downButtons">
+
                     </name>
                 </div>
                 <div class="rclock rclock-top">
-                    <div class="time" id="enemyTime">00:00:0</div>
+                    <div class="time" id="enemyTime">00:00.0</div>
                 </div>
                 <div class="rclock rclock-bottom">
-                    <div class="time" id="myTime">00:00:0</div>
+                    <div class="time" id="myTime">00:00.0</div>
                 </div>
             </div>
         </div>
