@@ -171,6 +171,16 @@ socket.on('onMove', (col) => {
     }
 })
 
+
+function windowResized() {
+    let canvasDiv = select('#canvasDiv');
+    let canvasWidth = canvasDiv.width;
+    let canvasHeight = canvasDiv.height;
+    resizeCanvas(canvasWidth, canvasHeight);
+    w = canvasWidth * 0.112
+}
+
+
 function setup() {
     let Params = new URLSearchParams(window.location.search)
     let roomId = Params.get("invite");
@@ -189,15 +199,15 @@ function setup() {
         window.history.pushState({}, document.title, "/");
     }
     imageMode(CENTER);
-    createCanvas(min(windowWidth, windowHeight), min(windowWidth, windowHeight) * 1.1);
-    w = min(windowWidth, windowHeight) * 0.112
-    button_undo = createButton('UNDO')
+    createCanvas(1, 1).parent("canvasDiv");
+    windowResized();
+    button_undo = createButton('UNDO').parent("downButtons")
     button_undo.mousePressed(() => {
         socket.emit('undo');
         highlighted = []
     })
     if (!roomId) {
-        let button2 = createButton('INVITE')
+        let button2 = createButton('INVITE').parent("downButtons")
         button2.mousePressed(() => {
             socket.emit('joinRoom', {
                 id: "room" + socket.id,
@@ -216,28 +226,28 @@ function setup() {
             }
         })
     }
-    button_newGame = createButton('NEW GAME')
+    button_newGame = createButton('REMATCH').parent("downButtons")
     button_newGame.mousePressed(() => {
         socket.emit('newGame');
     })
-    button_flipColors = createButton('FLIP COLORS')
+    button_flipColors = createButton('FLIP COLORS').parent("downButtons")
     button_flipColors.mousePressed(() => {
         socket.emit('flipColors');
     })
-    button_temp0 = createButton('2+1')
+    button_temp0 = createButton('2+1').parent("upButtons")
     button_temp0.mousePressed(() => {
         socket.emit('joinQueues', 0);
     })
-    button_temp1 = createButton('5+0')
+    button_temp1 = createButton('5+0').parent("upButtons")
     button_temp1.mousePressed(() => {
         socket.emit('joinQueues', 1);
     })
-    button_temp2 = createButton('unlimited')
+    button_temp2 = createButton('unlimited').parent("upButtons")
     button_temp2.mousePressed(() => {
         socket.emit('joinQueues', 2);
     })
-    let myTimer = createElement('h2')
-    let enemyTimer = createElement('h2')
+    let myTimer = select("#myTime")
+    let enemyTimer = select("#enemyTime")
     let timerSpeed = 90;
     let timeInterval = setInterval(() => {
         if (!myTime) return
@@ -269,8 +279,8 @@ function formatTime(time) {
 }
 
 function draw() {
-    background(0);
-    translate(w * 0.85, w / 3)
+    clear();
+    translate(w * 0.85, 0)
     noStroke()
     if (board) {
         for (let y = 0; y < 8; y++) {

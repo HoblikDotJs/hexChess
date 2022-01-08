@@ -57,6 +57,8 @@ io.on('connection', (socket) => {
                 let times = games[id].getTimes();
                 io.in(id).emit('updateTime', times);
                 io.in(id).emit('onMove', games[id].whoMoves);
+                //let bestMove = games[id].getBestMove(3);
+                //console.log(bestMove)
             }
         });
         socket.on('disconnect', () => {
@@ -195,6 +197,7 @@ io.on('connection', (socket) => {
             }
         }
     })
+
     socket.on('disconnect', () => {
         onlinePlayers--;
         console.log(onlinePlayers);
@@ -209,6 +212,7 @@ io.on('connection', (socket) => {
 //-------------------------------------------------
 //flip colors doesnt flip players timers - problem?
 //players have different colors on board - problem?
-
+/////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////
 const PORT = 8080
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));

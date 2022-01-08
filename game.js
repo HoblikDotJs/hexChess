@@ -13,6 +13,7 @@ class Rook {
         this.y = y;
         this.c = c;
         this.notation = "R";
+        this.value = 4;
     }
     getAvailableMoves(board) {
         let result = [];
@@ -201,6 +202,7 @@ class InvertedRook {
         this.y = y;
         this.c = c;
         this.notation = "I";
+        this.value = 4;
     }
     getAvailableMoves(board) {
         let result = [];
@@ -402,6 +404,7 @@ class Knight {
         this.y = y;
         this.c = c;
         this.notation = "N";
+        this.value = 5;
     }
     getAvailableMoves(board) {
         let result = [];
@@ -443,6 +446,7 @@ class Bishop {
         this.y = y;
         this.c = c;
         this.notation = "B";
+        this.value = 3;
     }
     getAvailableMoves(board) {
         let result = [];
@@ -657,6 +661,7 @@ class King {
         this.y = y;
         this.c = c;
         this.notation = "K";
+        this.value = 99999999999999999;
     }
     getAvailableMoves(board) {
         let result = [];
@@ -698,6 +703,7 @@ class Queen {
         this.y = y;
         this.c = c;
         this.notation = "Q";
+        this.value = 9;
     }
     getAvailableMoves(board) {
         let result = [];
@@ -974,6 +980,7 @@ class Pawn {
         this.y = y;
         this.c = c;
         this.notation = "P";
+        this.value = 1;
     }
     getAvailableMoves(board) {
         let result = [];
@@ -1133,6 +1140,7 @@ function fillBoardSimplified(simplifiedBoard) {
                     break;
             }
 
+
         }
     }
     return board;
@@ -1162,7 +1170,8 @@ function displayBoard(b) {
             result[y][x] = sign + board[y][x].piece.notation;
         }
     }
-    //console.table(result); TODO
+    //console.table(result);
+
     return result;
 }
 
@@ -1472,7 +1481,7 @@ class Game {
             this.startClock(this.timeIndex)
             this.lastBlackMove = false;
             this.lastWhiteMove = false
-            console.log(this.timeBlack, this.timeWhite)
+            //console.log(this.timeBlack, this.timeWhite)
             return true;
         }
     }
@@ -1492,6 +1501,135 @@ class Game {
             this.flipColorsReq = false;
             return true;
         }
+    }
+
+    evaluation(board) {
+        let sumW = 0
+        let sumB = 0
+        for (let y = 0; y < 8; y++) {
+            for (let x = 0; x < 8; x++) {
+                if (board[y][x].piece.c == 1) sumW += board[y][x].piece.value;
+                if (board[y][x].piece.c == -1) sumB += board[y][x].piece.value;
+            }
+        }
+        let evaluation = sumW - sumB;
+        return evaluation;
+    }
+
+    getAllMoves(b, c) {
+        let allMoves = []
+        let board = b
+        for (let y = 0; y < 8; y++) {
+            for (let x = 0; x < 8; x++) {
+                if (board[y][x].piece.notation != "") {
+                    board[y][x].piece.getAvailableMoves(board);
+                    if (board[y][x].piece.availableMoves.length > 0 && board[y][x].piece.c == c) {
+                        for (let i = 0; i < board[y][x].piece.availableMoves.length; i++) {
+                            allMoves.push({
+                                from: {
+                                    x: board[y][x].piece.x,
+                                    y: board[y][x].piece.y,
+                                },
+                                to: {
+                                    x: board[y][x].piece.availableMoves[i].x,
+                                    y: board[y][x].piece.availableMoves[i].y,
+                                }
+                            })
+                        }
+                    }
+                }
+            }
+        }
+        return allMoves;
+    }
+
+    getBoardFromMove(board, {
+        from,
+        to
+    }) {
+        let b = fillBoardSimplified(displayBoard(board));
+        for (let y = 0; y < 8; y++) {
+            for (let x = 0; x < 8; x++) {
+                if (b[y][x].piece.notation != "") b[y][x].piece.getAvailableMoves(b);
+            }
+        }
+        let piece = b[from.y][from.x].piece;
+        b[from.y][from.x].piece = {
+            notation: ""
+        }
+        if (piece.notation == "P") {
+            if (to.y == 7 || to.y == 0) {
+                let c = 1;
+                if (to.y == 7) {
+                    c = -1
+                }
+                piece = new Queen(to.x, to.y, c)
+            }
+        }
+        b[to.y][to.x].piece = piece;
+        b[to.y][to.x].piece.x = to.x;
+        b[to.y][to.x].piece.y = to.y;
+        return b;
+    }
+
+    getAllBoards(b, c) {
+        let startingB = b
+        let boards = []
+        let moves = this.getAllMoves(startingB, c)
+        for (let move of moves) {
+            let newBoard = this.getBoardFromMove(startingB, move);
+            boards.push(newBoard)
+        }
+        return boards;
+    }
+
+    minimax(board, depth, alpha, beta, maximazingPlayer, c) {
+        if (depth == 0) { // or game over 
+            return this.evaluation(board)
+        }
+        if (maximazingPlayer) {
+            let maxEval = -1000000000000;
+            this.getAllBoards(board, c).forEach(child => {
+                /*console.table(displayBoard(child))
+                console.log(this.evaluation(child))
+                maximazingPlayer ? console.log("max") : console.log("min")*/
+                let e = this.minimax(child, depth - 1, alpha, beta, false, c * -1);
+                maxEval = Math.max(maxEval, e)
+                alpha = Math.max(alpha, e);
+                if (beta <= alpha) {
+                    return;
+                }
+            });
+            return maxEval;
+        } else {
+            let minEval = 1000000000000;
+            this.getAllBoards(board, c).forEach(child => {
+                let e = this.minimax(child, depth - 1, alpha, beta, true, c * -1)
+                minEval = Math.min(minEval, e)
+                beta = Math.min(beta, e);
+                if (beta <= alpha) {
+                    return;
+                }
+            })
+            return minEval
+        }
+    }
+
+    getBestMove(depth) {
+        let bestMove;
+        let record = 1000000;
+        let moves = this.getAllMoves(this.board, -1)
+        for (let move in moves) {
+            let board = this.getBoardFromMove(this.board, moves[move])
+            let e = this.minimax(board, depth, -Infinity, Infinity, false, -1)
+            console.log(e) // wtf
+            if (e < record) {
+                record = e;
+                bestMove = moves[move]
+            }
+            record = Math.min(record, e)
+        }
+        return bestMove;
     }
 }
 

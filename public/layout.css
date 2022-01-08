@@ -1,0 +1,143 @@
+body {
+  background: #161512 linear-gradient(to bottom, #2e2a24, #161512 116px)
+    no-repeat;
+  overflow-x: hidden;
+  --site-header-height: 0px;
+  --site-header-margin: 0px;
+  --board-scale: 1;
+}
+.main-board {
+  position: relative;
+  display: block;
+  height: 0;
+  padding-bottom: 100%;
+  width: 100%;
+}
+.round {
+  grid-area: main;
+  display: grid;
+  grid-gap: 2vmin;
+  grid-template-areas: "app";
+}
+.round__app {
+  grid-area: app;
+}
+.ruser-top {
+  grid-area: user-top;
+}
+.ruser-bottom {
+  grid-area: user-bot;
+}
+.rclock-top {
+  grid-area: clock-top;
+}
+.rclock-bottom {
+  grid-area: clock-bot;
+}
+.round__app {
+  display: grid;
+}
+.round__app__board {
+  grid-area: board;
+}
+.rclock {
+  position: relative;
+  display: flex;
+  justify-content: flex-end;
+  color: #bababa;
+  font-family: "Roboto", Sans-Serif;
+}
+
+.rclock .time {
+  background: #262421;
+  min-width: 3em;
+  font-size: 2.8em;
+  line-height: 50px;
+  padding: 0 2vmin;
+  white-space: nowrap;
+  will-change: transform;
+  z-index: -1;
+  display: flex;
+}
+
+@media (min-width: 800px), (orientation: landscape) {
+  .round {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto fit-content(0) fit-content(0);
+    grid-template-areas: "app   app" "under side" "under uchat";
+  }
+  .rclock {
+    justify-content: space-between;
+  }
+  .rclock-bottom {
+    z-index: 0;
+  }
+  .round__app {
+    grid-template-columns:
+      minmax(
+        calc(70vmin * var(--board-scale)),
+        calc(
+          100vh * var(--board-scale) -
+            calc(var(--site-header-height) + var(--site-header-margin)) - 3rem
+        )
+      )
+      minmax(240px, 400px);
+    grid-template-areas: "board ." "board mat-top" "board clock-top" "board user-top" "board moves" "board controls" "board user-bot" "board expi-bot" "board clock-bot" "board mat-bot" "board ." "kb-move .";
+  }
+  .round__app__table {
+    grid-area: 4 / 2 / 10 / 3;
+  }
+}
+
+@media (min-width: 1260px) {
+  .round {
+    grid-template-columns:
+      minmax(230px, 20vw) minmax(
+        calc(70vmin * var(--board-scale)),
+        calc(
+          100vh * var(--board-scale) -
+            calc(var(--site-header-height) + var(--site-header-margin)) - 3rem
+        )
+      )
+      minmax(240px, 400px);
+    grid-template-areas: "side  app   app" "uchat under .";
+  }
+}
+
+@media (max-width: 799px) and (orientation: landscape) {
+  .round__app {
+    grid-template-columns:
+      minmax(
+        calc(55vmin),
+        calc(
+          100vh - calc(var(--site-header-height) + var(--site-header-margin)) -
+            2vmin
+        )
+      )
+      minmax(200px, 240px);
+    grid-column-gap: 3vmin;
+  }
+}
+
+@media (max-width: 799px) and (orientation: portrait) {
+  .rclock {
+    justify-self: flex-end;
+    z-index: 1;
+  }
+  .round__app {
+    grid-template-rows: auto auto 30px 20px auto auto 20px 30px auto;
+    grid-template-areas: "moves" "pocket-top" "user-top" "mat-top" "board" "expi-bot" "mat-bot" "user-bot" "pocket-bot" "kb-move" "controls";
+  }
+  .round__app .rclock-top {
+    grid-area: 3 / 1 / 5 / 2;
+  }
+  .round__app .rclock-bottom {
+    grid-area: 7 / 1 / 9 / 2;
+  }
+  #main-wrap {
+    --main-max-width: calc(
+      100vh - calc(var(--site-header-height) + var(--site-header-margin)) -
+        100px - 3.5em
+    );
+  }
+}

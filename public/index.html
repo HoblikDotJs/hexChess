@@ -4,9 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no,viewport-fit=cover" />
     <script src="https://cdn.jsdelivr.net/npm/p5@1.4.0/lib/p5.js"></script>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="layout.css">
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-77HQXRXJ43"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
@@ -21,6 +23,32 @@
 </head>
 
 <body>
+    <div id="main-wrap">
+        <div class="round">
+            <div class="round__app">
+                <div class="round__app__board main-board" id="canvasDiv">
+                </div>
+                <div class="round__app__table"></div>
+                <div class="ruser-top" id="upButtons">
+                    <name>
+                        .
+                    </name>
+                </div>
+                <span data-icon=""></span>
+                <div class="ruser-bottom" id="downButtons">
+                    <name>
+                        .
+                    </name>
+                </div>
+                <div class="rclock rclock-top">
+                    <div class="time" id="enemyTime">00:00:0</div>
+                </div>
+                <div class="rclock rclock-bottom">
+                    <div class="time" id="myTime">00:00:0</div>
+                </div>
+            </div>
+        </div>
+    </div>
     <script src="/socket.io/socket.io.js"></script>
     <script src="/sketch.js"></script>
 </body>
