@@ -1,3 +1,11 @@
+/*
+TODO
+TIMER doesnt reset after new game
+undo time when undo move
+game crashes randomly?
+*/
+
+//---------------------------------------
 const http = require('http');
 const express = require('express')
 const socketio = require('socket.io');

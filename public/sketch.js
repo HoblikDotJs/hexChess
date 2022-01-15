@@ -424,7 +424,7 @@ function mousePressed() {
         }
         let drawY = obj.y * w * 1.05 + w / 2 + offset
         let drawX = obj.x * w * 0.9 + w / 2
-        if (sqrt(pow(drawX - mouseX + w * 0.85, 2) + pow(drawY - mouseY + w / 3, 2)) < w / 2) {
+        if (sqrt(pow(drawX - mouseX + w * 0.85, 2) + pow(drawY - mouseY, 2)) < w / 2) {
             socket.emit('move', {
                 from: clickedPiece,
                 to: {
@@ -448,7 +448,7 @@ function mousePressed() {
             }
             let drawY = y * w * 1.05 + w / 2 + offset
             let drawX = x * w * 0.9 + w / 2
-            if (sqrt(pow(drawX - mouseX + w * 0.85, 2) + pow(drawY - mouseY + w / 3, 2)) < w / 2) {
+            if (sqrt(pow(drawX - mouseX + w * 0.85, 2) + pow(drawY - mouseY, 2)) < w / 2) {
                 showAvailableMoves(x, y);
             }
         }
