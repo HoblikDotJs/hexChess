@@ -1,7 +1,6 @@
 /*
 TODO
 indicator that player is active
-disconnect disconnect from queue
 game crashes randomly while playing
 */
 

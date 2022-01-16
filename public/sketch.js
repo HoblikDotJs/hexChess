@@ -491,7 +491,7 @@ function hexagon(transX, transY, s, c, x, y) {
     fill(c);
     console.log()
     if ((abs(7 * colorMult - lastMove.from.x) == x && abs(7 * colorMult - lastMove.from.y) == y) || (abs(7 * colorMult - lastMove.to.x) == x && abs(7 * colorMult - lastMove.to.y) == y))
-     fill(150, 255, 150)
+        fill("#d5ff80")
     push();
     translate(transX, transY);
     scale(s);
