@@ -118,6 +118,13 @@ socket.on('stopUndoReq', () => {
     button_undo.removeClass('active');
     button_undo.removeClass('waiting');
     weAreOnMove = !weAreOnMove;
+    if (weAreOnMove) {
+        select('#enemyTime').removeClass('onMove');
+        select('#myTime').addClass('onMove');
+    } else {
+        select('#enemyTime').addClass('onMove');
+        select('#myTime').removeClass('onMove');
+    }
 })
 
 socket.on('flipColorsReq', () => {
@@ -208,7 +215,6 @@ socket.on('onMove', (col) => {
     if (myColor == "-" && col == -1) {
         weAreOnMove = true;
     }
-    console.log(afterFirstMove, weAreOnMove)
     if (afterFirstMove) {
         if (weAreOnMove) {
             select('#enemyTime').removeClass('onMove');
@@ -484,7 +490,8 @@ function hexagon(transX, transY, s, c, x, y) {
     strokeWeight(5);
     fill(c);
     console.log()
-    if ((abs(7 * colorMult - lastMove.from.x) == x && abs(7 * colorMult - lastMove.from.y) == y) || (abs(7 * colorMult - lastMove.to.x) == x && abs(7 * colorMult - lastMove.to.y) == y)) fill(150, 255, 150)
+    if ((abs(7 * colorMult - lastMove.from.x) == x && abs(7 * colorMult - lastMove.from.y) == y) || (abs(7 * colorMult - lastMove.to.x) == x && abs(7 * colorMult - lastMove.to.y) == y))
+     fill(150, 255, 150)
     push();
     translate(transX, transY);
     scale(s);

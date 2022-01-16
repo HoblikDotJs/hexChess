@@ -1,6 +1,7 @@
 /*
 TODO
-active players 
+active players?
+disconnect disconnect from queue
 game crashes randomly?
 */
 
@@ -26,6 +27,7 @@ let queues = [
 ];
 let onlinePlayers = 0;
 io.on('connection', (socket) => {
+    //console.log(Object.keys(games))
     onlinePlayers++;
     console.log(onlinePlayers)
     socket.on('joinRoom', ({
@@ -50,6 +52,7 @@ io.on('connection', (socket) => {
             from,
             to
         }) => {
+            //console.log(games[id]) // UNDEFINED
             if (games[id].canMove(socket.id)) {
                 let newBoard = games[id].move(from, to);
                 io.in(id).emit('board', newBoard);

@@ -17,19 +17,14 @@ button {
 }
 
 .waiting {
-  filter: invert(40%) sepia(80%) saturate(1352%) hue-rotate(20deg)
-    brightness(119%) contrast(119%);
+  filter: brightness(0) saturate(100%) invert(89%) sepia(16%) saturate(4635%)
+    hue-rotate(301deg) brightness(107%) contrast(102%);
 }
 
 .active {
-  filter: invert(40%) sepia(80%) saturate(1352%) hue-rotate(250deg)
-    brightness(119%) contrast(119%);
+  filter: brightness(0) saturate(100%) invert(54%) sepia(91%) saturate(346%)
+    hue-rotate(42deg) brightness(96%) contrast(82%);
 }
-
-.timeOver {
-  color: red;
-}
-
 .ruser-top {
   margin-bottom: 2vh;
   margin-top: 1vh;
@@ -37,4 +32,8 @@ button {
 
 .onMove {
   color: #7bac33;
+}
+
+.timeOver {
+  color: #ff0000;
 }

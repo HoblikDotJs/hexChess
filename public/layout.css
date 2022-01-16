@@ -67,7 +67,6 @@ body {
 }
 
 @media (min-width: 800px), (orientation: landscape) {
-  /*landsape tablet?? */
   .round {
     grid-template-columns: 1fr 1fr;
     grid-template-rows: auto fit-content(0) fit-content(0);
@@ -97,7 +96,6 @@ body {
 }
 
 @media (min-width: 1260px) {
-  /* tablet, pc */
   .round {
     grid-template-columns:
       minmax(230px, 20vw) minmax(
@@ -113,7 +111,6 @@ body {
 }
 
 @media (max-width: 799px) and (orientation: landscape) {
-  /* landscape phone*/
   body {
     --board-scale: 0.8;
   }
@@ -136,7 +133,6 @@ body {
 }
 
 @media (max-width: 799px) and (orientation: portrait) {
-  /* portrait phone */
   .rclock {
     justify-self: flex-end;
     z-index: 1;
