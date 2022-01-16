@@ -1,6 +1,6 @@
 /*
 TODO
-after undo time can run to enemy
+active players 
 game crashes randomly?
 */
 

@@ -208,6 +208,16 @@ socket.on('onMove', (col) => {
     if (myColor == "-" && col == -1) {
         weAreOnMove = true;
     }
+    console.log(afterFirstMove, weAreOnMove)
+    if (afterFirstMove) {
+        if (weAreOnMove) {
+            select('#enemyTime').removeClass('onMove');
+            select('#myTime').addClass('onMove');
+        } else {
+            select('#enemyTime').addClass('onMove');
+            select('#myTime').removeClass('onMove');
+        }
+    }
 })
 
 function windowResized() {

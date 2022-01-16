@@ -34,3 +34,7 @@ button {
   margin-bottom: 2vh;
   margin-top: 1vh;
 }
+
+.onMove {
+  color: #7bac33;
+}
