@@ -1,6 +1,5 @@
 /*
 TODO
-TIMER doesnt reset after new game
 undo time when undo move
 game crashes randomly?
 */
@@ -118,6 +117,7 @@ io.on('connection', (socket) => {
                 io.in(id).emit('newGame');
                 let times = games[id].getTimes();
                 io.in(id).emit('updateTime', times);
+                console.log(times)
             }
         });
         socket.on('flipColors', () => {

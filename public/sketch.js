@@ -14,6 +14,8 @@ let clickedPiece, myColor;
 let pieces = {}
 let colorMult = 0;
 let weAreOnMove = false;
+let timeInterval;
+let afterFirstMove = false;
 let lastMove = {
     from: {
         x: 100,
@@ -53,6 +55,7 @@ socket.on('board', msg => {
 
 socket.on('lastMove', msg => {
     lastMove = msg;
+    afterFirstMove = true;
 })
 
 function reverseBoard() {
@@ -81,8 +84,13 @@ socket.on('newGameReq', msg => {
 })
 
 socket.on('newGame', msg => {
+    afterFirstMove = false;
     button_newGame.removeClass('active')
     button_newGame.removeClass('waiting')
+    select("#enemyTime").removeClass('timeOver')
+    select("#myTime").removeClass('timeOver')
+    clearInterval(timeInterval)
+    timeInterval = makeInterval()
 })
 
 socket.on('availableMoves', msg => {
@@ -280,15 +288,19 @@ function setup() {
         socket.emit('joinQueues', 2);
         button_temp2.toggleClass("active");
     })
+    timeInterval = makeInterval();
+}
+
+function makeInterval() {
     let myTimer = select("#myTime")
     let enemyTimer = select("#enemyTime")
     let timerSpeed = 90;
-    let timeInterval = setInterval(() => {
+    return setInterval(() => {
         if (!myTime) return
         if (weAreOnMove) {
-            if (myTime > 0) myTime -= timerSpeed
+            if (myTime > 0 && afterFirstMove) myTime -= timerSpeed
         } else {
-            if (enemyTime > 0) enemyTime -= timerSpeed
+            if (enemyTime > 0 && afterFirstMove) enemyTime -= timerSpeed
         }
         if (myTime <= 0) {
             myTimer.addClass('timeOver')

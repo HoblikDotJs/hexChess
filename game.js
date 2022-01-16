@@ -1139,8 +1139,6 @@ function fillBoardSimplified(simplifiedBoard) {
                     board[y][x].piece = new Pawn(x, y, color)
                     break;
             }
-
-
         }
     }
     return board;
@@ -1302,6 +1300,8 @@ class Game {
             case 0:
                 this.timeBlack = 120 * 1000;
                 this.timeWhite = 120 * 1000;
+                /*this.timeWhite = 2000
+                this.timeBlack = 2000*/
                 this.increasement = 1 * 1000;
                 break;
             case 1:
