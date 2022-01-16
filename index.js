@@ -1,8 +1,8 @@
 /*
 TODO
-active players?
+indicator that player is active
 disconnect disconnect from queue
-game crashes randomly?
+game crashes randomly while playing
 */
 
 //---------------------------------------
@@ -52,7 +52,6 @@ io.on('connection', (socket) => {
             from,
             to
         }) => {
-            //console.log(games[id]) // UNDEFINED
             if (games[id].canMove(socket.id)) {
                 let newBoard = games[id].move(from, to);
                 io.in(id).emit('board', newBoard);
@@ -213,20 +212,16 @@ io.on('connection', (socket) => {
     })
 
     socket.on('disconnect', () => {
+        for (let queue in queues) {
+            if (queues[queue].includes(socket.id)) {
+                queues[queue].splice(queues[queue].indexOf(socket.id), 1)
+            }
+        }
         onlinePlayers--;
         console.log(onlinePlayers);
-        console.log(Object.keys(games))
     });
     io.emit('roomFill', [queues[0].length, queues[1].length, queues[2].length]);
 })
-//TODO:
-// 
-//
-//
-//-------------------------------------------------
-//flip colors doesnt flip players timers - problem?
-//players have different colors on board - problem?
-/////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////
+
 const PORT = 8080
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
