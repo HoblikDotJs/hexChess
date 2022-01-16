@@ -117,6 +117,7 @@ socket.on('newUndoReq', () => {
 socket.on('stopUndoReq', () => {
     button_undo.removeClass('active');
     button_undo.removeClass('waiting');
+    weAreOnMove = !weAreOnMove;
 })
 
 socket.on('flipColorsReq', () => {

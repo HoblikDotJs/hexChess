@@ -1379,6 +1379,11 @@ class Game {
         return newBoard;
     }
 
+    calculateTimes() {
+        this.lastBlackMove = Date.now();
+        this.lastWhiteMove = Date.now();
+    }
+
     getNewActions() {
         return this.actions
     }

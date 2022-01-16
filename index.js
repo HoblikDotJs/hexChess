@@ -1,6 +1,6 @@
 /*
 TODO
-undo time when undo move
+after undo time can run to enemy
 game crashes randomly?
 */
 
@@ -95,6 +95,9 @@ io.on('connection', (socket) => {
                     io.in(id).emit('availableMoves', newActions);
                     let newLastMove = games[id].getPreviousMove();
                     io.in(id).emit('lastMove', newLastMove);
+                    games[id].calculateTimes();
+                    let times = games[id].getTimes();
+                    io.in(id).emit('updateTime', times);
                 }
                 io.in(id).emit('stopUndoReq');
             }
@@ -117,7 +120,7 @@ io.on('connection', (socket) => {
                 io.in(id).emit('newGame');
                 let times = games[id].getTimes();
                 io.in(id).emit('updateTime', times);
-                console.log(times)
+
             }
         });
         socket.on('flipColors', () => {
