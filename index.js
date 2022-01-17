@@ -1,6 +1,5 @@
 /*
 TODO
-indicator that player is active
 game crashes randomly while playing
 */
 
@@ -73,10 +72,12 @@ io.on('connection', (socket) => {
             if (games[id] != undefined) {
                 if (games[id].idWhite == socket.id) {
                     console.log("changing white")
+                    io.in(games[id].idBlack).emit('enemyDisconnected');
                     games[id].resetId(1);
                 }
                 if (games[id].idBlack == socket.id) {
                     console.log("changing black")
+                    io.in(games[id].idWhite).emit('enemyDisconnected');
                     games[id].resetId(-1)
                 }
                 if (!games[id].idWhite && !games[id].idBlack) {

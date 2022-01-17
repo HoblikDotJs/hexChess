@@ -226,6 +226,13 @@ socket.on('onMove', (col) => {
     }
 })
 
+socket.on('enemyDisconnected', ()=>{
+    clearInterval(timeInterval);
+    select('#enemyTime').addClass("inactive");
+    select('#myTime').addClass("inactive");
+    alert("Enemy disconnected");
+})
+
 function windowResized() {
     let canvasDiv = select('#canvasDiv');
     let canvasWidth = canvasDiv.width;
