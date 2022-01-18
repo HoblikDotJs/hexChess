@@ -226,7 +226,7 @@ socket.on('onMove', (col) => {
     }
 })
 
-socket.on('enemyDisconnected', ()=>{
+socket.on('enemyDisconnected', () => {
     clearInterval(timeInterval);
     select('#enemyTime').addClass("inactive");
     select('#myTime').addClass("inactive");

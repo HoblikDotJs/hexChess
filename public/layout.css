@@ -4,7 +4,7 @@ body {
   --site-header-height: 0px;
   --site-header-margin: 0px;
   --board-scale: 1;
-  overflow-x: hidden;
+  overflow: hidden;
   -webkit-touch-callout: none; /* iOS Safari */
   -webkit-user-select: none; /* Safari */
   -khtml-user-select: none; /* Konqueror HTML */
