@@ -27,7 +27,7 @@ button {
 }
 .ruser-top {
   margin-bottom: 2vh;
-  margin-top: 1vh;
+  margin-top: 2vh;
 }
 
 .onMove {
@@ -38,6 +38,13 @@ button {
   color: #ff0000;
 }
 
-.inactive{
+.inactive {
+  color: #bababa;
+}
+
+.iconDescription {
+  margin-bottom: 2vh;
+  font-family: "Roboto", Sans-Serif;
+  font-weight: 600;
   color: #bababa;
 }

@@ -11,6 +11,7 @@ body {
   -moz-user-select: none; /* Old versions of Firefox */
   -ms-user-select: none; /* Internet Explorer/Edge */
   user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
+  color: white;
 }
 .main-board {
   position: relative;
@@ -154,11 +155,12 @@ body {
     );
   }
   img {
+    margin-top: -5vh;
     height: 35px;
     width: 35px;
+    margin-left: 2vw;
   }
   button {
-    margin-left: 5vw;
     margin-top: -1vh;
   }
   .rclock .time {
@@ -171,5 +173,18 @@ body {
 
   .rclock-bottom {
     margin-top: 1vh;
+  }
+  .iconDescription {
+    display: none;
+  }
+  .ruser-top {
+    margin-left: 2vh;
+  }
+  .ruser-top button {
+    margin-top: 1.5vh;
+  }
+  .ruser-bottom {
+    margin-top: 1.5vh;
+    margin-left: 2vh;
   }
 }

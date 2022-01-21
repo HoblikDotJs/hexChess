@@ -230,7 +230,7 @@ socket.on('enemyDisconnected', () => {
     clearInterval(timeInterval);
     select('#enemyTime').addClass("inactive");
     select('#myTime').addClass("inactive");
-    alert("Enemy disconnected");
+    alert("Opponent disconnected");
 })
 
 function windowResized() {
@@ -261,12 +261,6 @@ function setup() {
     imageMode(CENTER);
     createCanvas(1, 1).parent("canvasDiv");
     windowResized();
-    button_undo = createButton("<img src='/icons/undo.svg'>").parent("downButtons")
-    button_undo.mousePressed(() => {
-        socket.emit('undo');
-        highlighted = []
-        if (board) button_undo.toggleClass("active")
-    })
     if (!roomId) {
         let button2 = createButton("<img src='/icons/invite.svg' style='display:none;'>") //.parent("downButtons") TODO:
         button2.mousePressed(() => {
@@ -287,27 +281,33 @@ function setup() {
             }
         })
     }
-    button_newGame = createButton("<img src='/icons/rematch.svg'>").parent("downButtons")
-    button_newGame.mousePressed(() => {
-        socket.emit('newGame');
-        if (board) button_newGame.toggleClass("active")
+    button_undo = createButton("<img src='/icons/undo.svg'> <div class='iconDescription'>UNDO</div>").parent("downButtons")
+    button_undo.mousePressed(() => {
+        socket.emit('undo');
+        highlighted = []
+        if (board) button_undo.toggleClass("active")
     })
-    button_flipColors = createButton("<img src='/icons/swap.svg'>").parent("downButtons")
+    button_flipColors = createButton("<img src='/icons/swap.svg'> <div class='iconDescription'>FLIP</div>").parent("downButtons")
     button_flipColors.mousePressed(() => {
         socket.emit('flipColors');
         if (board) button_flipColors.toggleClass("active");
     })
-    button_temp0 = createButton("<img src='/icons/fast.svg'>").parent("upButtons")
+    button_newGame = createButton("<img src='/icons/rematch.svg'> <div class='iconDescription'>REMATCH</div>").style("margin-left", "1vw").parent("downButtons")
+    button_newGame.mousePressed(() => {
+        socket.emit('newGame');
+        if (board) button_newGame.toggleClass("active")
+    })
+    button_temp0 = createButton("<img src='/icons/fast.svg'> <div class='iconDescription'>2+1</div>").parent("upButtons")
     button_temp0.mousePressed(() => {
         socket.emit('joinQueues', 0);
         button_temp0.toggleClass("active");
     })
-    button_temp1 = createButton("<img src='/icons/slow.svg'>").parent("upButtons")
+    button_temp1 = createButton("<img src='/icons/slow.svg'> <div class='iconDescription'>5+0</div>").parent("upButtons")
     button_temp1.mousePressed(() => {
         socket.emit('joinQueues', 1);
         button_temp1.toggleClass("active");
     })
-    button_temp2 = createButton("<img src='/icons/infinity.svg'>").parent("upButtons")
+    button_temp2 = createButton("<img src='/icons/infinity.svg'> <div class='iconDescription'>WITHOUT</div>").style("margin-left", "1vw").parent("upButtons")
     button_temp2.mousePressed(() => {
         socket.emit('joinQueues', 2);
         button_temp2.toggleClass("active");
