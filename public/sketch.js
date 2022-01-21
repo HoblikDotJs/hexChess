@@ -281,33 +281,33 @@ function setup() {
             }
         })
     }
-    button_undo = createButton("<img src='/icons/undo.svg'> <div class='iconDescription'>UNDO</div>").parent("downButtons")
+    button_undo = createButton("<img src='/icons/undo.svg' alt='undo'> <div class='iconDescription'>UNDO</div>").parent("downButtons")
     button_undo.mousePressed(() => {
         socket.emit('undo');
         highlighted = []
         if (board) button_undo.toggleClass("active")
     })
-    button_flipColors = createButton("<img src='/icons/swap.svg'> <div class='iconDescription'>FLIP</div>").parent("downButtons")
+    button_flipColors = createButton("<img src='/icons/swap.svg' alt='flip colors'> <div class='iconDescription'>FLIP</div>").parent("downButtons")
     button_flipColors.mousePressed(() => {
         socket.emit('flipColors');
         if (board) button_flipColors.toggleClass("active");
     })
-    button_newGame = createButton("<img src='/icons/rematch.svg'> <div class='iconDescription'>REMATCH</div>").style("margin-left", "1vw").parent("downButtons")
+    button_newGame = createButton("<img src='/icons/rematch.svg' alt='rematch'> <div class='iconDescription'>REMATCH</div>").style("margin-left", "1vw").parent("downButtons")
     button_newGame.mousePressed(() => {
         socket.emit('newGame');
         if (board) button_newGame.toggleClass("active")
     })
-    button_temp0 = createButton("<img src='/icons/fast.svg'> <div class='iconDescription'>2+1</div>").parent("upButtons")
+    button_temp0 = createButton("<img src='/icons/fast.svg' alt='2+1'> <div class='iconDescription'>2+1</div>").parent("upButtons")
     button_temp0.mousePressed(() => {
         socket.emit('joinQueues', 0);
         button_temp0.toggleClass("active");
     })
-    button_temp1 = createButton("<img src='/icons/slow.svg'> <div class='iconDescription'>5+0</div>").parent("upButtons")
+    button_temp1 = createButton("<img src='/icons/slow.svg' alt='5+0'> <div class='iconDescription'>5+0</div>").parent("upButtons")
     button_temp1.mousePressed(() => {
         socket.emit('joinQueues', 1);
         button_temp1.toggleClass("active");
     })
-    button_temp2 = createButton("<img src='/icons/infinity.svg'> <div class='iconDescription'>WITHOUT</div>").style("margin-left", "1vw").parent("upButtons")
+    button_temp2 = createButton("<img src='/icons/infinity.svg' alt='unlimited'> <div class='iconDescription'>WITHOUT</div>").style("margin-left", "1vw").parent("upButtons")
     button_temp2.mousePressed(() => {
         socket.emit('joinQueues', 2);
         button_temp2.toggleClass("active");
