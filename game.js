@@ -943,33 +943,58 @@ class Queen {
                 }
             }
         }
+        //~~+~~+~~+~~+~LEFT&RIGHT~+~~+~~+~~+~~//
         let evens = [0, 2, 4, 6];
         let odds = [1, 3, 5, 7];
         if (isOdd(this.x)) {
             let index = odds.indexOf(this.x);
-            odds.splice(index, 1);
-            for (let i = 0; i < odds.length; i++) {
-                if (board[this.y][odds[i]].piece.notation == "" || this.c != board[this.y][odds[i]].piece.c) {
+            let before = odds.slice(0, index);
+            let after = odds.slice(index + 1, odds.length);
+            for (let i = before.length - 1; i >= 0; i--) {
+                if (board[this.y][before[i]].piece.notation == "" || this.c != board[this.y][before[i]].piece.c) {
                     result.push({
-                        x: odds[i],
+                        x: before[i],
                         y: this.y,
                     })
+                } else {
+                    break;
+                }
+            }
+            for (let i = 0; i < after.length; i++) {
+                if (board[this.y][after[i]].piece.notation == "" || this.c != board[this.y][after[i]].piece.c) {
+                    result.push({
+                        x: after[i],
+                        y: this.y,
+                    })
+                } else {
+                    break;
                 }
             }
         } else {
             let index = evens.indexOf(this.x);
-            evens.splice(index, 1);
-            for (let i = 0; i < evens.length; i++) {
-                if (board[this.y][evens[i]].piece.notation == "" || this.c != board[this.y][evens[i]].piece.c) {
+            let before = evens.slice(0, index);
+            let after = evens.slice(index + 1, evens.length);
+            for (let i = before.length - 1; i >= 0; i--) {
+                if (board[this.y][before[i]].piece.notation == "" || this.c != board[this.y][before[i]].piece.c) {
                     result.push({
-                        x: evens[i],
+                        x: before[i],
                         y: this.y,
                     })
+                } else {
+                    break;
+                }
+            }
+            for (let i = 0; i < after.length; i++) {
+                if (board[this.y][after[i]].piece.notation == "" || this.c != board[this.y][after[i]].piece.c) {
+                    result.push({
+                        x: after[i],
+                        y: this.y,
+                    })
+                } else {
+                    break;
                 }
             }
         }
-
-
         this.availableMoves = result;
     }
 }
