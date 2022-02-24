@@ -1325,8 +1325,8 @@ class Game {
             case 0:
                 this.timeBlack = 120 * 1000;
                 this.timeWhite = 120 * 1000;
-                /*this.timeWhite = 2000
-                this.timeBlack = 2000*/
+                //this.timeWhite = 2000 test time
+                //this.timeBlack = 2000 test time
                 this.increasement = 1 * 1000;
                 break;
             case 1:
@@ -1381,6 +1381,10 @@ class Game {
                 piece = new Queen(to.x, to.y, c)
             }
         }
+        if (this.board[to.y][to.x].piece.notation == "K") {
+            this.whoMoves = 0;
+            this.winner = this.board[to.y][to.x].piece.c;
+        }
         this.board[to.y][to.x].piece = piece;
         this.board[to.y][to.x].piece.x = to.x;
         this.board[to.y][to.x].piece.y = to.y;
@@ -1399,6 +1403,10 @@ class Game {
             timePassed -= this.increasement;
             this.lastBlackMove = Date.now();
             this.timeBlack -= timePassed;
+        }
+        if (this.timeBlack <= 0 || this.timeWhite <= 0) {
+            this.whoMoves = 0;
+            this.winner = (this.timeBlack <= 0) ? -1 : 1;
         }
         this.whoMoves *= -1;
         return newBoard;
