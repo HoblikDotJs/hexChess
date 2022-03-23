@@ -1,6 +1,7 @@
 /*
 TODO
-game crashes randomly while playing
+
+game crashes randomly while playing?? when
 */
 
 //---------------------------------------
@@ -25,7 +26,6 @@ let queues = [
 ];
 let onlinePlayers = 0;
 io.on('connection', (socket) => {
-    //console.log(Object.keys(games))
     onlinePlayers++;
     console.log(onlinePlayers)
     socket.on('joinRoom', ({
@@ -140,7 +140,6 @@ io.on('connection', (socket) => {
     socket.on('joinQueues', (index) => {
         if (queues[index].includes(socket.id)) {
             queues[index].splice(queues[index].indexOf(socket.id, 1))
-            //io.to(socket.id).emit('stopQueuesReq', index);
             io.emit('roomFill', [queues[0].length, queues[1].length, queues[2].length]);
             return
         }
@@ -155,21 +154,6 @@ io.on('connection', (socket) => {
                 let roomid = uniqid()
                 let id1 = queues[index][0];
                 let id2 = queues[index][1];
-                let keys = Object.keys(games);
-                /*for (let i = keys.length - 1; i >= 0; i--) {
-                    if (games[keys[i]].idWhite == id1 || games[keys[i]].idBlack == id1) {
-                        delete games[keys[i]];
-                        keys.splice(i, 1)
-                        console.log('deleting game: ' + keys[i])
-                    }
-                }
-                for (let i = keys.length - 1; i >= 0; i--) {
-                    if (games[keys[i]].idWhite == id2 || games[keys[i]].idBlack == id2) {
-                        delete games[keys[i]];
-                        keys.splice(i, 1)
-                        console.log('deleting game: ' + keys[i])
-                    }
-                }*/
                 for (game in games) {
                     if (games[game].idWhite == id1 || games[game].idBlack == id1) {
                         delete games[game];
