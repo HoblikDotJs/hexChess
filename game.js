@@ -1527,7 +1527,6 @@ class Game {
             this.startClock(this.timeIndex)
             this.lastBlackMove = false;
             this.lastWhiteMove = false
-            //console.log(this.timeBlack, this.timeWhite)
             return true;
         }
     }
@@ -1641,9 +1640,6 @@ class Game {
         if (maximazingPlayer) {
             let maxEval = -1000000000000;
             this.getAllBoards(board, c).forEach(child => {
-                /*console.table(displayBoard(child))
-                console.log(this.evaluation(child))
-                maximazingPlayer ? console.log("max") : console.log("min")*/
                 let e = this.minimax(child, depth - 1, alpha, beta, false, c * -1);
                 maxEval = Math.max(maxEval, e)
                 alpha = Math.max(alpha, e);
@@ -1673,14 +1669,13 @@ class Game {
         for (let move in moves) {
             let board = this.getBoardFromMove(this.board, moves[move])
             let e = this.minimax(board, depth, -Infinity, Infinity, false, -1)
-            console.log(e) // wtf
             if (e < record) {
                 record = e;
                 bestMove = moves[move]
             }
             record = Math.min(record, e)
         }
-        return bestMove;
+        return bestMove; 
     }
 }
 

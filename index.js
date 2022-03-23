@@ -1,10 +1,3 @@
-/*
-TODO
-
-game crashes randomly while playing?? when
-*/
-
-//---------------------------------------
 const http = require('http');
 const express = require('express')
 const socketio = require('socket.io');
@@ -19,10 +12,10 @@ const io = socketio(server);
 app.use(express.static(path.join(__dirname, 'public')));
 
 let games = {}
-let queues = [
-    [],
-    [],
-    []
+let queues = [ // timetempo
+    [], //2+1 
+    [], //5+0
+    [] //unlimited
 ];
 let onlinePlayers = 0;
 io.on('connection', (socket) => {
@@ -67,8 +60,6 @@ io.on('connection', (socket) => {
                 let times = games[id].getTimes();
                 io.in(id).emit('updateTime', times);
                 io.in(id).emit('onMove', games[id].whoMoves);
-                //let bestMove = games[id].getBestMove(3);
-                //console.log(bestMove)
             }
         });
         socket.on('disconnect', () => {

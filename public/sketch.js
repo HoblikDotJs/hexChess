@@ -99,7 +99,6 @@ socket.on('availableMoves', msg => {
         actions[i].x = abs(7 * colorMult - actions[i].x)
         actions[i].y = abs(7 * colorMult - actions[i].y)
         for (let j = 0; j < actions[i].actions.length; j++) {
-            //console.log(actions[i].actions[j].x)
             actions[i].actions[j].x = abs(7 * colorMult - actions[i].actions[j].x)
             actions[i].actions[j].y = abs(7 * colorMult - actions[i].actions[j].y)
         }
@@ -170,9 +169,6 @@ socket.on('roomFill', (arr) => {
         } else {
             button_temp2.removeClass("waiting")
         }
-        /*button_temp0.html(`2+1 (${arr[0]})`)
-        button_temp1.html(`5+0 (${arr[1]})`)
-        button_temp2.html(`unlimited (${arr[2]})`)*/
     }
 })
 
@@ -274,7 +270,7 @@ function setup() {
     createCanvas(1, 1).parent("canvasDiv");
     windowResized();
     if (!roomId) {
-        let button2 = createButton("<img src='/icons/invite.svg' style='display:none;'>") //.parent("downButtons") TODO:
+        let button2 = createButton("<img src='/icons/invite.svg' style='display:none;'>");
         button2.mousePressed(() => {
             socket.emit('joinRoom', {
                 id: "room" + socket.id,
