@@ -41,8 +41,8 @@ io.on('connection', (socket) => {
         games[id].setId(socket.id)
         if (games[id].idWhite && games[id].idBlack) {
             if (games[id].lastMove) io.in(id).emit('lastMove', games[id].lastMove);
-            io.to(games[id].idWhite).emit('color', 1)
-            io.to(games[id].idBlack).emit('color', -1)
+            io.to(games[id].idWhite).emit('color', 1);
+            io.to(games[id].idBlack).emit('color', -1);
             io.in(id).emit('board', games[id].getSimplifiedBoard());
             io.in(id).emit('availableMoves', games[id].getNewActions());
         }
@@ -52,6 +52,9 @@ io.on('connection', (socket) => {
         }) => {
             if (games[id].canMove(socket.id)) {
                 let newBoard = games[id].move(from, to);
+                if (games[id].whoMoves == 0) {
+                    io.in(id).emit('endGame', games[id].winner);
+                }
                 io.in(id).emit('board', newBoard);
                 let newActions = games[id].getNewActions();
                 io.in(id).emit('availableMoves', newActions);
@@ -137,6 +140,7 @@ io.on('connection', (socket) => {
             }
         });
     });
+
     socket.on('joinQueues', (index) => {
         if (queues[index].includes(socket.id)) {
             queues[index].splice(queues[index].indexOf(socket.id, 1))
@@ -204,6 +208,7 @@ io.on('connection', (socket) => {
         onlinePlayers--;
         console.log(onlinePlayers);
     });
+
     io.emit('roomFill', [queues[0].length, queues[1].length, queues[2].length]);
 })
 

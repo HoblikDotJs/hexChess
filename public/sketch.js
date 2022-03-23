@@ -207,6 +207,18 @@ socket.on('updateTime', (times) => {
     }
 })
 
+socket.on('endGame', (c) => {
+    let winner;
+    clearInterval(timeInterval)
+    if (c == 1) {
+        winner = "+"
+    }
+    if (c == -1) {
+        winner = "-"
+    }
+    (winner == myColor) ? alert("You lost!"): alert("You won!");
+})
+
 socket.on('onMove', (col) => {
     weAreOnMove = false;
     if (myColor == "+" && col == 1) {
@@ -330,11 +342,15 @@ function makeInterval() {
             myTimer.addClass('timeOver')
             clearInterval(timeInterval);
             myTime = 0
+            weAreOnMove = false;
+            alert("You lost!")
         }
         if (enemyTime <= 0) {
             enemyTimer.addClass('timeOver')
             clearInterval(timeInterval);
             enemyTime = 0;
+            weAreOnMove = false;
+            alert("You win!")
         }
         myTimer.html(formatTime(myTime));
         enemyTimer.html(formatTime(enemyTime));
